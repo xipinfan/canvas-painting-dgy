@@ -23,12 +23,23 @@ export default defineComponent({
   },
   emits: [],
   components: {},
-  setup(props, ctx) {
+  setup(props, { expose }) {
     const canvas = ref<HTMLCanvasElement|null>(null);
     console.log(props)
+
     onMounted(()=>{
       console.log(canvas.value);
     })
+
+    const canvasCssText = function(text:string):void{
+      if(!canvas.value)return;
+      canvas.value.style.cssText = text;
+    }
+
+    expose({
+      canvasCssText
+    })
+
     return () => (
       <canvas ref={canvas} ></canvas>
     )
