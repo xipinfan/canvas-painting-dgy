@@ -1,5 +1,5 @@
 import { defineComponent,ref } from 'vue'
-import CanvasD from './canvas-d'
+import CanvasD from './components/CanvasD'
 
 export default defineComponent({
 
