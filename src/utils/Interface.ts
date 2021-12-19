@@ -12,4 +12,44 @@ interface canvasDProps {
   fontWeight: string
 }
 
-export { canvasDProps }
+interface imgRe {
+  width: number
+  height: number
+  dWidth: number
+  dHeight: number
+}
+
+interface shapeType {
+  width: number
+  height: number
+}
+
+interface props {
+  imgFunc: (imgRe: imgRe) => void
+}
+
+interface imgd {
+  red: number
+  green: number
+  blue: number
+  alpha: number
+}
+
+interface imgM {
+  x1: number
+  x2: number
+  y1: number
+  y2: number
+}
+
+interface xy {
+  x: number
+  y: number
+}
+
+interface layer {
+  layerY: number
+  layerX: number
+}
+
+export { canvasDProps, shapeType, props, imgd, imgM, xy, layer }

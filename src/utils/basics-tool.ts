@@ -1,4 +1,5 @@
 //保存一些特定的工具函数
+import { shapeType, props, xy } from './Interface'
 
 const colorHex = function (color: string): string {
   // RGB颜色值的正则
@@ -49,50 +50,6 @@ const colorRgb = function (color: string): string {
     return color
   }
 }
-const ellipse = function (
-  canvasCtx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  radiusX: number,
-  radiusY: number,
-  rotation: number,
-  startAngle: number,
-  endAngle: number,
-  anticlockwise: boolean
-): void {
-  const r = radiusX > radiusY ? radiusX : radiusY //用打的数为半径
-  const scaleX = radiusX / r //计算缩放的x轴比例
-  const scaleY = radiusY / r //计算缩放的y轴比例
-  canvasCtx.save() //保存副本
-  canvasCtx.translate(x, y) //移动到圆心位置
-  canvasCtx.rotate(rotation) //进行旋转
-  canvasCtx.scale(scaleX, scaleY) //进行缩放
-  canvasCtx.arc(0, 0, r, startAngle, endAngle, anticlockwise) //绘制圆形
-  canvasCtx.restore() //还原副本
-}
-
-const ellipsefill = function (
-  canvasCtx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  radiusX: number,
-  radiusY: number,
-  rotation: number,
-  startAngle: number,
-  endAngle: number,
-  anticlockwise: boolean
-): void {
-  const r = radiusX > radiusY ? radiusX : radiusY //用打的数为半径
-  const scaleX = radiusX / r //计算缩放的x轴比例
-  const scaleY = radiusY / r //计算缩放的y轴比例
-  canvasCtx.save() //保存副本
-  canvasCtx.translate(x, y) //移动到圆心位置
-  canvasCtx.rotate(rotation) //进行旋转
-  canvasCtx.scale(scaleX, scaleY) //进行缩放
-  canvasCtx.arc(0, 0, r, startAngle, endAngle, anticlockwise) //绘制圆形
-  canvasCtx.fill()
-  canvasCtx.restore() //还原副本
-}
 
 const getJSON = function (url: string): Promise<string> {
   return new Promise(function (resolve, reject) {
@@ -140,4 +97,47 @@ export function canvasICOInit(w: number, h: number, type: string, size: number) 
   return canvas.toDataURL('image/png', 1)
 }
 
-export { colorHex, colorRgb, ellipse, ellipsefill, getJSON, checkUrl }
+const contrast = function (a: number, b: number, width: number, height: number): shapeType {
+  const node: shapeType = { width: a, height: b }
+
+  while (a > width || b > height) {
+    a = a * 0.8
+    b = b * 0.8
+  }
+
+  // eslint-disable-next-line prettier/prettier
+  [node.width, node.height] = [Math.floor(a), Math.floor(b)]
+  return node
+}
+
+const imageCreate = function (src: string, { imgFunc }: props, { width, height }: shapeType): void {
+  const img: HTMLImageElement = new Image()
+  img.src = src
+  img.onload = function () {
+    const node: shapeType = contrast(img.width, img.height, width, height)
+    imgFunc({
+      width: node.width,
+      height: node.height,
+      dWidth: img.width - node.width,
+      dHeight: img.height - node.height
+    })
+  }
+}
+
+const lineDistance = function (beginspot: xy, endspot: xy): number {
+  //点到点距离公式
+  return Math.sqrt(Math.pow(beginspot.x - endspot.x, 2) + Math.pow(beginspot.y - endspot.y, 2))
+}
+
+const pointToLine = function (beginline: xy, endline: xy, node: xy): number {
+  //点到线距离函数
+  if (beginline.x - endline.x !== 0) {
+    const k = (beginline.y - endline.y) / (beginline.x - endline.x)
+    const b = beginline.y - k * beginline.x
+    return Math.abs(k * node.x - node.y + b) / Math.sqrt(Math.pow(k, 2) + 1)
+  } else {
+    return Math.abs(node.x - beginline.x)
+  }
+}
+
+export { colorHex, colorRgb, getJSON, checkUrl, contrast, imageCreate, lineDistance, pointToLine }

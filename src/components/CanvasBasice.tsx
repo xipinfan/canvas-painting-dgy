@@ -33,38 +33,54 @@ export default defineComponent({
       setCssText(`position:${props.position};z-index:${props.zIndex};`);
       canvasCtx.value = canvas.value.getContext('2d');
     })
-
     //快速设定css
     const setCssText = function(text:string):void{
       if(!canvas.value)return;
       canvas.value.style.cssText = text;
     }
-
     //修改类名
     const setClassName = function(name:string):void{
       if(!canvas.value)return;
       canvas.value.className = name;
     }
+    //保存图片函数
+    const saveImag = function(name:string, cut: boolean):Promise<boolean> {
+      return new Promise((resolve, reject)=>{
+        if(!canvas.value){
+          reject(false);
+        }
+        else{
+          const imgdata = canvas.value.toDataURL('png', 1).replace('image/png',  'image/octet-stream');
+          const link = document.createElement('a');
+          link.href = imgdata;
+          link.download =  name + '.png';
+          link.click();
+          resolve(true);
+        }
+      })
+    }
+
 
     expose({
       setCssText,    //设定css
       setClassName,
-      canvas,   //canvas的dom
-      canvasCtx   //canvas的getContext('2d')
+      saveImag,
     })
 
     //将事件导出外部使用
     return () => (
-      <canvas
-       ref={canvas}
-       height={props.height}
-       width={props.width}
-       onClick={()=>{ emit('click') }}
-       onMousedown={()=>{ emit('mousedown') }}
-       onMouseup={()=>{ emit('mouseup') }}
-       onMouseleave={()=>{ emit('mouseleave') }}
-       onMousemove={()=>{ emit('mousemove') }}
-        ></canvas>
+      <>
+        <canvas
+        ref={canvas}
+        height={props.height}
+        width={props.width}
+        onClick={()=>{ emit('click') }}
+        onMousedown={()=>{ emit('mousedown') }}
+        onMouseup={()=>{ emit('mouseup') }}
+        onMouseleave={()=>{ emit('mouseleave') }}
+        onMousemove={()=>{ emit('mousemove') }}
+          ></canvas>  
+      </>
     )
   }
 })

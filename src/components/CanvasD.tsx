@@ -57,10 +57,7 @@ export default defineComponent({
     onMounted(():void=>{
       console.log(bgCavnas.value.canvas);
     })
-
-    function cli(){
-      console.log('?')
-    }
+    
     //总共三层canvas背景、基础、操作，分别定义在不同的文件，textarea是用来输入文字的
     return () => (
       <> 
