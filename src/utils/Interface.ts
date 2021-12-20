@@ -1,55 +1,62 @@
 //props的接口定义
 interface canvasDProps {
-  width: number
-  height: number
-  tool: string
-  bgColor: string
-  penSize: number
-  strokeColor: string
-  eraserSize: number
-  fontSize: number
-  fontFamily: string
-  fontWeight: string
+  width: number;
+  height: number;
+  tool: string;
+  bgColor: string;
+  penSize: number;
+  strokeColor: string;
+  eraserSize: number;
+  fontSize: number;
+  fontFamily: string;
+  fontWeight: string;
 }
 
 interface imgRe {
-  width: number
-  height: number
-  dWidth: number
-  dHeight: number
+  width: number;
+  height: number;
+  dWidth: number;
+  dHeight: number;
 }
 
 interface shapeType {
-  width: number
-  height: number
+  width: number;
+  height: number;
 }
 
 interface props {
-  imgFunc: (imgRe: imgRe) => void
+  imgFunc: (imgRe: imgRe) => void;
 }
 
 interface imgd {
-  red: number
-  green: number
-  blue: number
-  alpha: number
+  red: number;
+  green: number;
+  blue: number;
+  alpha: number;
 }
 
 interface imgM {
-  x1: number
-  x2: number
-  y1: number
-  y2: number
+  x1: number;
+  x2: number;
+  y1: number;
+  y2: number;
 }
 
 interface xy {
-  x: number
-  y: number
+  x: number;
+  y: number;
 }
 
 interface layer {
-  layerY: number
-  layerX: number
+  layerY: number;
+  layerX: number;
 }
 
-export { canvasDProps, shapeType, props, imgd, imgM, xy, layer }
+interface drawType {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export { canvasDProps, shapeType, props, imgd, imgM, xy, layer, drawType };

@@ -6,13 +6,9 @@ module.exports = {
     sourceType: 'module', // Allows for the use of imports
     ecmaFeatures: {
       // Allows for the parsing of JSX
-      jsx: true
-    }
+      jsx: true,
+    },
   },
-  extends: [
-    'plugin:vue/vue3-recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:prettier/recommended'
-  ],
-  rules: {}
-}
+  extends: ['plugin:vue/vue3-recommended', 'plugin:@typescript-eslint/recommended', 'plugin:prettier/recommended'],
+  rules: {},
+};
