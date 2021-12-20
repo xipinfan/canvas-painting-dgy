@@ -1,5 +1,5 @@
 import { defineComponent,ref,onMounted } from 'vue'
-import { layer, imgM, drawType, xy } from '../utils/Interface';
+import { layer, imgM, drawType, xy, trianglePlot } from '../utils/Interface';
 
 //基础canvas的定义
 export default defineComponent({
@@ -34,17 +34,17 @@ export default defineComponent({
       setCssText(`position:${props.position};z-index:${props.zIndex};`);
       canvasCtx.value = canvas.value.getContext('2d');
     })
-    //快速设定css
+    // 快速设定css
     const setCssText = function(text:string):void{
       if(!canvas.value)return;
       canvas.value.style.cssText = text;
     }
-    //修改类名
+    // 修改类名
     const setClassName = function(name:string):void{
       if(!canvas.value)return;
       canvas.value.className = name;
     }
-    //保存图片函数
+    // 保存图片函数
     const saveImag = function(name:string, cut: boolean):Promise<boolean> {
       return new Promise((resolve, reject)=>{
         if(!canvas.value){
@@ -67,7 +67,7 @@ export default defineComponent({
 			canvasCtx.value.fillRect( beginX, beginY, endX, endY );
 			canvasCtx.value.restore();
 		}
-    //重置画布
+    // 重置画布
     const initBoard = function (color: string): void {
 			if(!canvasCtx.value)return;
       canvasCtx.value.clearRect(0,0,props.width,props.height);
@@ -75,7 +75,7 @@ export default defineComponent({
         fillRect ( 0, 0, props.width, props.height, color );
       }
     }
-		//橡皮擦
+		// 橡皮擦
 		const eliminate = function ( color: string, layers:layer, eraserSize: number ): void {
 			if (!canvasCtx.value) return;
 			if (!color) {
@@ -84,27 +84,27 @@ export default defineComponent({
 				fillRect ( layers.layerX, layers.layerY, eraserSize, eraserSize, color );
 			}
 		}
-		//映射函数
+		// 映射函数
 		const drawImage = function ( Img: HTMLImageElement,sDraw: drawType, Draw: drawType ): void {
 			canvasCtx.value?.drawImage( Img, sDraw.x, sDraw.y, sDraw.width, sDraw.height,
 				Draw.x, Draw.y, Draw.width, Draw.height );
 		}
-		//画笔函数
+		// 画笔函数
 		const drawLine = function ( polt: imgM, pensize: number ): void {
 			if (!canvasCtx.value) return;
 			canvasCtx.value.beginPath();
 			canvasCtx.value.arc( (polt.x1 + polt.x2)/2, (polt.y1 + polt.y2)/2, pensize, 0, Math.PI*2, true );
 			canvasCtx.value.fill();
 		}
-		//直线函数
-		const drawDemoLine = function ( beginLine: xy, endLine: xy ): void {
+		// 直线函数
+		const drawDemoLine = function (beginLine: xy, endLine: xy): void {
 			if (!canvasCtx.value) return;
 			canvasCtx.value.beginPath();
 			canvasCtx.value.moveTo( beginLine.x, beginLine.y );
 			canvasCtx.value.lineTo( endLine.x, endLine.y );
 			canvasCtx.value.stroke();
 		}
-		//直线的操作框
+		// 直线的操作框
 		const lineBox = function ( x1: number, y1: number, x2: number, y2: number ): void {
 			const path: xy[] = [ {x:x1, y:y1}, {x:x2, y:y2} ];
 			path.forEach((element:xy):void => {
@@ -114,7 +114,79 @@ export default defineComponent({
 				canvasCtx.value.stroke();
 			})
 		}
-
+    // 矩形函数
+    const solidBox = function (beginLine: xy, endLine: xy, imageStatus: string): void {
+      if (!canvasCtx.value) return;
+      const minx: number = Math.min(beginLine.x, endLine.x);
+      const miny: number = Math.min(beginLine.y, endLine.y);
+      const maxx: number = Math.max(beginLine.x, endLine.x);
+      const maxy: number = Math.max(beginLine.y, endLine.y);
+      if (imageStatus === 'stroke') {
+        canvasCtx.value.strokeRect(minx, miny, maxx, maxy);
+      } else {
+        canvasCtx.value.fillRect(minx, miny, maxx, maxy);
+      }
+    }
+    // 虚线提示框
+    const dottedBox = function (beginLine: xy, endLine: xy): void {
+      if (!canvasCtx.value) return;
+      const x: number = Math.min(beginLine.x, endLine.x);
+      const y: number = Math.min(beginLine.y, endLine.y); 
+      const w: number = Math.abs(endLine.x - beginLine.x); 
+      const h: number = Math.abs(endLine.y - beginLine.y);
+      canvasCtx.value.save();
+      canvasCtx.value.setLineDash([5, 2]);
+      canvasCtx.value.lineDashOffset = -10;
+      canvasCtx.value.strokeStyle = 'rgba(131,191,236)';
+      canvasCtx.value.lineWidth = 1;
+      canvasCtx.value.strokeRect(x, y, w, h);
+      const nodeLine:xy = { x: w/2 + x, y: h/2 + y };
+      const path:xy[] = [
+        { x:beginLine.x, y:beginLine.y }, { x:endLine.x, y:endLine.y },
+        { x:endLine.x, y:beginLine.y }, { x:beginLine.x, y:endLine.y },
+        { x:beginLine.x, y:nodeLine.y }, { x:endLine.x, y:nodeLine.y },
+        { x:nodeLine.x, y:beginLine.y }, { x:nodeLine.x, y:endLine.y },
+      ];
+      path.forEach( (event:xy): void => {
+        if (!canvasCtx.value) return;
+        canvasCtx.value.strokeStyle = 'rgba(117,117,117)';
+        canvasCtx.value.strokeRect(event.x-1, event.y-1, 3, 3);
+        canvasCtx.value.fillStyle = 'rgba(255,255,255)';
+        canvasCtx.value.fillRect(event.x, event.y, 2, 2);
+      })
+      canvasCtx.value.restore();
+    }
+    function triangleStatus (imageStatus: string): void {
+      if (!canvasCtx.value) return;
+      if(imageStatus === 'stroke'){
+        canvasCtx.value.stroke();
+      }
+      else{
+        canvasCtx.value.fill();
+      }
+    }
+    function triangleDraw (plot: trianglePlot, imageStatus: string) : void {
+      if (!canvasCtx.value) return;
+      canvasCtx.value.beginPath();
+      canvasCtx.value.moveTo(plot.begin.x, plot.begin.y);
+      canvasCtx.value.lineTo(plot.mid.x, plot.mid.y);
+      canvasCtx.value.lineTo(plot.end.x, plot.end.y);
+      canvasCtx.value.closePath();
+      triangleStatus(imageStatus);
+    }
+    //三角形
+    const Triangle = function (firstplot: xy, endplot: xy, type: string = 'solid', imageStatus: string) {
+      if (!canvasCtx.value) return;
+      let beginPlot = {x:firstplot.x, y:firstplot.y};
+      if (type === 'isosceles') {
+        beginPlot.x = (firstplot.x + endplot.x)/2;
+      }
+      triangleDraw({
+          begin: beginPlot,
+          mid: {x:firstplot.x, y:endplot.y},
+          end: {x:endplot.x, y:endplot.y},
+        }, imageStatus);
+    }
     expose({
       setCssText,    //设定css
       setClassName,
@@ -122,6 +194,9 @@ export default defineComponent({
 			initBoard,
 			eliminate,
 			drawImage,
+      lineBox,
+      dottedBox,
+      Triangle,
     })
 
     //将事件导出外部使用

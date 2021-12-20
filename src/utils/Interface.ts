@@ -59,4 +59,10 @@ interface drawType {
   height: number;
 }
 
-export { canvasDProps, shapeType, props, imgd, imgM, xy, layer, drawType };
+interface trianglePlot {
+  begin: xy;
+  mid: xy;
+  end: xy;
+}
+
+export { canvasDProps, shapeType, props, imgd, imgM, xy, layer, drawType, trianglePlot };
