@@ -51,16 +51,19 @@ export default defineComponent({
   },
   setup(props, ctx) {
     const bgCavnas = ref();   //保存背景canvas
-    const inTextarea = ref();   //保存textarea
+    const inTextarea = ref<HTMLTextAreaElement | null>();   //保存textarea
+		const frame = ref();    //保存画布框体
     provide('setUp', props);
-    
+
     onMounted(():void=>{
-      console.log(bgCavnas.value.canvas);
+			if (!inTextarea.value || !frame.value) return;
+			inTextarea.value.style.cssText = 'opacity: 0;z-index: -1001; position: absolute;';
+			frame.value.style.cssText = `width:${props.width}px;height:${props.height}px;`;
     })
-    
+
     //总共三层canvas背景、基础、操作，分别定义在不同的文件，textarea是用来输入文字的
     return () => (
-      <> 
+      <div ref={frame}>
         <CanvasBasice
          ref={bgCavnas}
          height={props.height}
@@ -74,7 +77,7 @@ export default defineComponent({
          <OperationCanvas></OperationCanvas>
 
          <textarea ref={inTextarea}></textarea>
-      </>
+      </div>
     )
   }
 })

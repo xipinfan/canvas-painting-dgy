@@ -131,8 +131,8 @@ export default defineComponent({
     const dottedBox = function (beginLine: xy, endLine: xy): void {
       if (!canvasCtx.value) return;
       const x: number = Math.min(beginLine.x, endLine.x);
-      const y: number = Math.min(beginLine.y, endLine.y); 
-      const w: number = Math.abs(endLine.x - beginLine.x); 
+      const y: number = Math.min(beginLine.y, endLine.y);
+      const w: number = Math.abs(endLine.x - beginLine.x);
       const h: number = Math.abs(endLine.y - beginLine.y);
       canvasCtx.value.save();
       canvasCtx.value.setLineDash([5, 2]);
@@ -156,6 +156,7 @@ export default defineComponent({
       })
       canvasCtx.value.restore();
     }
+    //判断绘制是否填充
     function triangleStatus (imageStatus: string): void {
       if (!canvasCtx.value) return;
       if(imageStatus === 'stroke'){
@@ -165,6 +166,7 @@ export default defineComponent({
         canvasCtx.value.fill();
       }
     }
+    //
     function triangleDraw (plot: trianglePlot, imageStatus: string) : void {
       if (!canvasCtx.value) return;
       canvasCtx.value.beginPath();
@@ -175,8 +177,7 @@ export default defineComponent({
       triangleStatus(imageStatus);
     }
     //三角形
-    const Triangle = function (firstplot: xy, endplot: xy, type: string = 'solid', imageStatus: string) {
-      if (!canvasCtx.value) return;
+    const Triangle = function (firstplot: xy, endplot: xy, type: string = 'solid', imageStatus: string):void {
       let beginPlot = {x:firstplot.x, y:firstplot.y};
       if (type === 'isosceles') {
         beginPlot.x = (firstplot.x + endplot.x)/2;
@@ -186,6 +187,48 @@ export default defineComponent({
           mid: {x:firstplot.x, y:endplot.y},
           end: {x:endplot.x, y:endplot.y},
         }, imageStatus);
+    }
+    //菱形
+    const drawDiamond = function (firstplot: xy, endplot: xy, imageStatus: string) {
+      if (!canvasCtx.value) return;
+      const mid:xy = {
+        x: (firstplot.x + endplot.x)/2,
+        y: (firstplot.y + endplot.y)/2
+      }
+      const x = (endplot.x - firstplot.x)/2;
+      const y = (endplot.y - firstplot.y)/2;
+      canvasCtx.value.beginPath();
+      canvasCtx.value.moveTo( mid.x + x , mid.y );
+      canvasCtx.value.lineTo( mid.x  , mid.y - y );
+      canvasCtx.value.lineTo( mid.x - x , mid.y );
+      canvasCtx.value.lineTo( mid.x  , mid.y + y );
+      canvasCtx.value.closePath();
+      triangleStatus(imageStatus);
+    } 
+    //文本
+    const text = function (textDottedLine: imgM, value: string, fontType: string, textStyle: boolean, fontSize: number): number {
+      if (!canvasCtx.value) return 0;
+      let index = 0;
+      const textQueue: string[] = [''];
+      const textWidth: number = Math.abs(textDottedLine.x2 - textDottedLine.x1);
+      canvasCtx.value.save();
+      canvasCtx.value.font = fontType;
+      for(let i of value){
+        if (canvasCtx.value.measureText(textQueue[index] + i).width > textWidth || i === '\n') {
+          index += 1;
+          textQueue.push('');
+        }
+        if(i != '\n')textQueue[index] += i;
+      }
+      for (let i = 0; i < textQueue.length; i++) {
+        if (textStyle) {
+          canvasCtx.value.fillText(textQueue[i], textDottedLine.x1, textDottedLine.y1 + fontSize * (i+1));
+        } else {
+          canvasCtx.value.strokeText(textQueue[i], textDottedLine.x1, textDottedLine.y1 + fontSize * (i+1));
+        }
+      }
+      canvasCtx.value.restore();
+      return textQueue.length * fontSize;  //判断是否需要伸长框体
     }
     expose({
       setCssText,    //设定css
@@ -197,6 +240,7 @@ export default defineComponent({
       lineBox,
       dottedBox,
       Triangle,
+      text
     })
 
     //将事件导出外部使用
