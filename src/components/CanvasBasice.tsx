@@ -1,5 +1,6 @@
 import { defineComponent,ref,onMounted } from 'vue'
 import { layer, imgM, drawType, xy, trianglePlot } from '../utils/Interface';
+import { paintBucket } from '../utils/canvas-tool'
 
 //基础canvas的定义
 export default defineComponent({
@@ -29,23 +30,23 @@ export default defineComponent({
     const canvas = ref<HTMLCanvasElement | null>(null);
     const canvasCtx = ref<CanvasRenderingContext2D | null>(null);
 
-    onMounted(():void=>{
+    onMounted((): void=>{
       if(!canvas.value)return;
       setCssText(`position:${props.position};z-index:${props.zIndex};`);
       canvasCtx.value = canvas.value.getContext('2d');
     })
     // 快速设定css
-    const setCssText = function(text:string):void{
+    const setCssText = function(text: string): void{
       if(!canvas.value)return;
       canvas.value.style.cssText = text;
     }
     // 修改类名
-    const setClassName = function(name:string):void{
+    const setClassName = function(name: string): void{
       if(!canvas.value)return;
       canvas.value.className = name;
     }
     // 保存图片函数
-    const saveImag = function(name:string, cut: boolean):Promise<boolean> {
+    const saveImag = function(name: string, cut: boolean): Promise<boolean> {
       return new Promise((resolve, reject)=>{
         if(!canvas.value){
           reject(false);
@@ -70,18 +71,19 @@ export default defineComponent({
     // 重置画布
     const initBoard = function (color: string): void {
 			if(!canvasCtx.value)return;
-      canvasCtx.value.clearRect(0,0,props.width,props.height);
+      canvasCtx.value.clearRect( 0, 0, props.width, props.height );
       if(color){
         fillRect ( 0, 0, props.width, props.height, color );
       }
     }
 		// 橡皮擦
-		const eliminate = function ( color: string, layers:layer, eraserSize: number ): void {
+		const eliminate = function ( color: string, layers:xy, eraserSize: number ): void {
 			if (!canvasCtx.value) return;
+      
 			if (!color) {
-				canvasCtx.value.clearRect( layers.layerX, layers.layerY, eraserSize, eraserSize )
+				canvasCtx.value.clearRect( layers.x, layers.y, eraserSize, eraserSize )
 			} else {
-				fillRect ( layers.layerX, layers.layerY, eraserSize, eraserSize, color );
+				fillRect ( layers.x, layers.y, eraserSize, eraserSize, color );
 			}
 		}
 		// 映射函数
@@ -90,10 +92,10 @@ export default defineComponent({
 				Draw.x, Draw.y, Draw.width, Draw.height );
 		}
 		// 画笔函数
-		const drawLine = function ( polt: imgM, pensize: number ): void {
+		const drawLine = function ( polt: xy, pensize: number ): void {
 			if (!canvasCtx.value) return;
 			canvasCtx.value.beginPath();
-			canvasCtx.value.arc( (polt.x1 + polt.x2)/2, (polt.y1 + polt.y2)/2, pensize, 0, Math.PI*2, true );
+			canvasCtx.value.arc( polt.x, polt.y, pensize, 0, Math.PI*2, true );
 			canvasCtx.value.fill();
 		}
 		// 直线函数
@@ -166,7 +168,7 @@ export default defineComponent({
         canvasCtx.value.fill();
       }
     }
-    //
+    //绘制三角形使用
     function triangleDraw (plot: trianglePlot, imageStatus: string) : void {
       if (!canvasCtx.value) return;
       canvasCtx.value.beginPath();
@@ -208,7 +210,7 @@ export default defineComponent({
     //文本
     const text = function (textDottedLine: imgM, value: string, fontType: string, textStyle: boolean, fontSize: number): number {
       if (!canvasCtx.value) return 0;
-      let index = 0;
+      let index: number = 0;
       const textQueue: string[] = [''];
       const textWidth: number = Math.abs(textDottedLine.x2 - textDottedLine.x1);
       canvasCtx.value.save();
@@ -230,17 +232,46 @@ export default defineComponent({
       canvasCtx.value.restore();
       return textQueue.length * fontSize;  //判断是否需要伸长框体
     }
+    //获取canvas的Imagedata值
+    const getImageData = function (firstplot: xy, endplot: xy): ImageData | undefined {
+      if(canvasCtx.value === null)return;
+      return canvasCtx.value.getImageData(
+        firstplot.x,
+        firstplot.y,
+        endplot.x,
+        endplot.y
+      );
+    }
+    const paintB = function (spots: xy,intensity: number, color: string): void {
+      if(canvasCtx.value === null)return;
+      const ImageData:ImageData = getImageData({x:0, y:0}, {x:props.width, y:props.height}) as ImageData;
+      paintBucket(ImageData, spots.x, spots.y, color, intensity);
+      canvasCtx.value.putImageData(ImageData, 0, 0);
+    }
+    //统一调用事件响应
+    const op = function (type: string):(payload: MouseEvent) => void {
+      return function(payload: MouseEvent) {
+        emit(type as "click" | "mousedown" | "mouseup" | "mouseleave" | "mousemove", payload);
+      }
+    }
+
     expose({
-      setCssText,    //设定css
-      setClassName,
-      saveImag,
-			initBoard,
-			eliminate,
-			drawImage,
-      lineBox,
-      dottedBox,
-      Triangle,
-      text
+      setCssText,    // 设定css
+      setClassName,  // 修改类名
+      saveImag,      // 保存图片函数
+			initBoard,     // 重置画布
+			eliminate,     // 橡皮擦
+			drawImage,     // 映射函数
+      drawLine,      // 画笔函数
+      drawDemoLine,  // 直线函数
+      lineBox,       // 直线的操作框
+      solidBox,      // 矩形函数
+      dottedBox,     // 虚线提示框
+      Triangle,      // 三角形
+      drawDiamond,   // 菱形
+      text,          // 文本
+      paintB,        // 油漆桶
+      getImageData,  // 获取imagedata
     })
 
     //将事件导出外部使用
@@ -250,11 +281,11 @@ export default defineComponent({
         ref={canvas}
         height={props.height}
         width={props.width}
-        onClick={()=>{ emit('click') }}
-        onMousedown={()=>{ emit('mousedown') }}
-        onMouseup={()=>{ emit('mouseup') }}
-        onMouseleave={()=>{ emit('mouseleave') }}
-        onMousemove={()=>{ emit('mousemove') }}
+        onClick={op('click')}
+        onMousedown={op('mousedown')}
+        onMouseup={op('mouseup')}
+        onMouseleave={op('mouseleave')}
+        onMousemove={op('mousemove')}
           ></canvas>
       </>
     )

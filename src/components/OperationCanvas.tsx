@@ -7,6 +7,12 @@ export default defineComponent({
   inheritAttrs: false,
   emits: [],
   components: {},
+  props:{
+    zIndex:{
+      type:Number,
+      default:1000
+    }
+  },
   setup(props, ctx) {
     const opCanvas = ref();
     const setUp:canvasDProps | null = inject('setUp') || null;
@@ -18,7 +24,7 @@ export default defineComponent({
          height={setUp.height}
          width={setUp.width}
          position={'absolute'}
-         zIndex={ -1001 }
+         zIndex={ props.zIndex }
          ></CanvasBasice>
     </>)
   }

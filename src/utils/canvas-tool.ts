@@ -158,9 +158,7 @@ const updownImage = function (dataURL: string, type: string): Promise<HTMLImageE
 };
 
 const extractPixels = function (imageData: ImageData): string {
-  //提取颜色
-  const data = imageData.data;
-  return `RGB(${data[0]},${data[1]},${data[2]})`;
+  return `RGB(${imageData.data[0]},${imageData.data[1]},${imageData.data[2]})`;
 };
 // 计算灰度值
 function rgbToGray(r: number, g: number, b: number): number {

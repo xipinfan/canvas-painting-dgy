@@ -65,4 +65,9 @@ interface trianglePlot {
   end: xy;
 }
 
-export { canvasDProps, shapeType, props, imgd, imgM, xy, layer, drawType, trianglePlot };
+interface diff {
+  difference: number;
+  negative: number;
+}
+
+export { canvasDProps, shapeType, props, imgd, imgM, xy, layer, drawType, trianglePlot, diff };

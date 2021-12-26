@@ -1,5 +1,5 @@
 //保存一些特定的工具函数
-import { shapeType, props, xy } from './Interface';
+import { shapeType, props, xy, diff } from './Interface';
 
 const colorHex = function (color: string): string {
   // RGB颜色值的正则
@@ -138,4 +138,29 @@ const pointToLine = function (beginline: xy, endline: xy, node: xy): number {
   }
 };
 
-export { colorHex, colorRgb, getJSON, checkUrl, contrast, imageCreate, lineDistance, pointToLine };
+const route = function (beginline: xy, endline: xy): xy[] {
+  const lines: xy[] = [];
+  // 计算两个点坐标的差值并累加绘制
+  const conversion = function (difference: number): diff {
+    if (difference < 0) {
+      return { difference: -difference, negative: -1 };
+    }
+    return { difference: difference, negative: 1 };
+  };
+
+  const differenceX: number = endline.x - beginline.x;
+  const differenceY: number = endline.y - beginline.y;
+  const negativeX: diff = conversion(differenceX);
+  const negativeY: diff = conversion(differenceY);
+  const maxDistance: number = Math.max(negativeX.difference, negativeY.difference);
+  // 找到当前差值最大的点，等比例遍历绘制
+  for (let i = 1; i <= maxDistance; i += 1) {
+    lines.push({
+      x: beginline.x + (negativeX.difference / maxDistance) * i * negativeX.negative,
+      y: beginline.y + (negativeY.difference / maxDistance) * i * negativeY.negative,
+    });
+  }
+  return lines;
+};
+
+export { colorHex, colorRgb, getJSON, checkUrl, contrast, imageCreate, lineDistance, pointToLine, route };

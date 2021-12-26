@@ -2,6 +2,7 @@ import { defineComponent,ref,provide,onMounted } from 'vue'
 import BaseCanvas from './BaseCanvas';
 import CanvasBasice from './CanvasBasice'
 import OperationCanvas from './OperationCanvas';
+import { xy } from '../utils/Interface'
 
 //项目住文件
 export default defineComponent({
@@ -17,7 +18,7 @@ export default defineComponent({
       default:400
     },
     tool:{
-      type:Number,
+      type:String,
       default:'pencil'
     },
     bgColor:{
@@ -49,11 +50,24 @@ export default defineComponent({
       default:'400'
     },
   },
-  setup(props, ctx) {
-    const bgCavnas = ref();   //保存背景canvas
+  setup(props, { slots, expose }) {
     const inTextarea = ref<HTMLTextAreaElement | null>();   //保存textarea
 		const frame = ref();    //保存画布框体
+    const baCanvas = ref(); //保存基础画布
+    const opIndex = ref<number>(-1001);
+    const baIndex = ref<number>(1000);
     provide('setUp', props);
+
+    switch(props.tool){
+      case 'pickup':
+      case 'pencil':{
+        baIndex.value = 1000;
+        opIndex.value = -1001;
+      }
+      default: {
+        
+      }
+    }
 
     onMounted(():void=>{
 			if (!inTextarea.value || !frame.value) return;
@@ -61,20 +75,28 @@ export default defineComponent({
 			frame.value.style.cssText = `width:${props.width}px;height:${props.height}px;`;
     })
 
+    expose({
+      pickup: (spotX: number, spotY: number): string=>{
+        return baCanvas.value?.pickup({x: spotX, y: spotY})
+      },
+      bucket: (x: number, y: number,intensity: number = 20, color: string = props.strokeColor): void=>{
+        baCanvas.value?.bucket({ x, y }, intensity, color);
+      }
+    })
+
     //总共三层canvas背景、基础、操作，分别定义在不同的文件，textarea是用来输入文字的
     return () => (
       <div ref={frame}>
-        <CanvasBasice
-         ref={bgCavnas}
-         height={props.height}
-         width={props.width}
-         position={'absolute'}
-         zIndex={ -999 }
-         ></CanvasBasice>
+        { slots.default && slots.default() }
 
-         <BaseCanvas></BaseCanvas>
+         <BaseCanvas
+          ref = {baCanvas}
+          zIndex={baIndex.value}
+          ></BaseCanvas>
 
-         <OperationCanvas></OperationCanvas>
+         <OperationCanvas
+          zIndex={opIndex.value}
+          ></OperationCanvas>
 
          <textarea ref={inTextarea}></textarea>
       </div>
