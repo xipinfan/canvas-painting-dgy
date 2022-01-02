@@ -1,4 +1,5 @@
 import { defineComponent,ref,provide,onMounted, watch, PropType } from 'vue'
+import propsCanvasD from '../utils/props';
 import BaseCanvas from './BaseCanvas';
 import OperationCanvas from './OperationCanvas';
 
@@ -6,48 +7,7 @@ import OperationCanvas from './OperationCanvas';
 export default defineComponent({
   name:'cavnas-d',
   inheritAttrs:false,
-  props: {
-    width:{
-      type:Number,
-      default:400
-    },
-    height:{
-      type:Number,
-      default:400
-    },
-    tool:{
-      type:String,
-      default:'pencil'
-    },
-    bgColor:{
-      type:String,
-      default:''
-    },
-    penSize:{
-      type:Number,
-      default:6
-    },
-    strokeColor:{
-      type:String,
-      default:'#000000'
-    },
-    eraserSize:{
-      type:Number,
-      default:6
-    },
-    fontSize:{
-      type:Number,
-      default:16
-    },
-    fontFamily:{
-      type:String,
-      default:'sans-serif'
-    },
-    fontWeight:{
-      type:String,
-      default:'400'
-    },
-  },
+  props:propsCanvasD,
   setup(props, { slots, expose }) {
 
     const inTextarea = ref<HTMLTextAreaElement | null>();   //保存textarea
@@ -56,16 +16,9 @@ export default defineComponent({
     const baIndex = ref<number>(1000);
 		const ImageDatas: string[] = [];
 		const forwardData: string[] = [];
-		//type ppp = typeof props;
     provide('item', props);
 		provide('ImageDatas', ImageDatas);
 		provide('forwardData', forwardData);
-
-		// for(const key in props) {
-		// 	if (Object.prototype.hasOwnProperty.call(props, key)) {
-		// 		console.log(props[key as keyof canvasDProps], key);
-		// 	}
-		// }
 
 		function initTool (tool: string): void {
 			baIndex.value = 1000;

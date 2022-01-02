@@ -1,17 +1,4 @@
 //props的接口定义
-interface canvasDProps {
-  width: number;
-  height: number;
-  tool: Type;
-  bgColor: string;
-  penSize: number;
-  strokeColor: string;
-  eraserSize: number;
-  fontSize: number;
-  fontFamily: string;
-  fontWeight: string;
-}
-
 interface imgRe {
   width: number;
   height: number;
@@ -92,13 +79,17 @@ type typeMouse = {
   eraserMove: (e: MouseEvent) => void;
   eraserDowm: (e: MouseEvent) => void;
 };
-type typeOpD = 'lineDowm';
+type typeOpD = 'lineMove';
 type typeOpMouse = {
-  lineDowm: (e: MouseEvent) => void;
+  e: xy;
+  mobile: xy;
+  spotNode: string;
+  lineMove: () => void;
+  lineBaseMove: () => void;
+  lineDraw: () => void;
 };
 
 export {
-  canvasDProps,
   shapeType,
   props,
   imgd,

@@ -1,6 +1,7 @@
 import { defineComponent,ref,onMounted, inject, watch } from 'vue'
-import { imgM, drawType, xy, trianglePlot, canvasDProps } from '../utils/Interface';
+import { imgM, drawType, xy, trianglePlot } from '../utils/Interface';
 import { paintBucket } from '../utils/canvas-tool'
+import OperationCanvas from './OperationCanvas';
 
 //基础canvas的定义
 export default defineComponent({
@@ -18,10 +19,10 @@ export default defineComponent({
     const canvas = ref<HTMLCanvasElement | null>(null);
     const canvasCtx = ref<CanvasRenderingContext2D | null>(null);
 
-		const item: canvasDProps | null = inject('item') || null;
+		const item: typeof OperationCanvas | null = inject('item') || null;
     if(!item) return;
 		//修改canvas的基础设置
-		function changeConfig (newVal: canvasDProps ) {
+		function changeConfig (newVal: typeof OperationCanvas ) {
 			if(canvasCtx.value === null) return;
 			canvasCtx.value.fillStyle = newVal.strokeColor;
 			canvasCtx.value.strokeStyle = newVal.strokeColor;
@@ -40,15 +41,22 @@ export default defineComponent({
       if(!canvas.value)return;
       setCssText(`position:absolute;z-index:${props.zIndex};`);
       canvasCtx.value = canvas.value.getContext('2d') as CanvasRenderingContext2D;
-			changeConfig(item);
+			canvasCtx.value.lineCap = "round";
+      canvasCtx.value.lineJoin = "miter";
+      changeConfig(item);
 		})
     // 快速设定css
-    const setCssText = function(text: string): void{
+    const setCssText = function(text: string): void {
       if(!canvas.value)return;
       canvas.value.style.cssText = text;
     }
+    // 设定单个css
+    const setCss = function(name: any, type: string): void {
+      if(!canvas.value)return;
+      canvas.value.style[name] = type;
+    }
     // 修改类名
-    const setClassName = function(name: string): void{
+    const setClassName = function(name: string): void {
       if(!canvas.value)return;
       canvas.value.className = name;
     }
@@ -114,14 +122,17 @@ export default defineComponent({
 			canvasCtx.value.stroke();
 		}
 		// 直线的操作框
-		const lineBox = function ( x1: number, y1: number, x2: number, y2: number ): void {
-			const path: xy[] = [ {x:x1, y:y1}, {x:x2, y:y2} ];
-			path.forEach((element:xy):void => {
-				if (!canvasCtx.value) return;
-				canvasCtx.value.beginPath();
-				canvasCtx.value.arc( element.x, element.y, 5, 0, Math.PI*2, true );
-				canvasCtx.value.stroke();
+		const lineBox = function ( beginLine: xy, endLine: xy ): void {
+			const path: xy[] = [ beginLine, endLine ];
+      if (!canvasCtx.value) return;
+      canvasCtx.value.save();
+      canvasCtx.value.strokeStyle = 'rgba(0,0,0,0.3)';
+      path.forEach((element:xy):void => {
+				canvasCtx.value?.beginPath();
+				canvasCtx.value?.arc( element.x, element.y, 5, 0, Math.PI*2, true );
+				canvasCtx.value?.stroke();
 			})
+      canvasCtx.value.restore();
 		}
     // 矩形函数
     const solidBox = function (beginLine: xy, endLine: xy, imageStatus: string): void {
@@ -265,6 +276,7 @@ export default defineComponent({
     }
 
     expose({
+      setCss,        // 设定单个css
       setCssText,    // 设定css
       setClassName,  // 修改类名
       saveImag,      // 保存图片函数

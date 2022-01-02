@@ -1,6 +1,6 @@
 import { lineDistance, pointToLine } from './basics-tool';
 import { xy } from './Interface';
-
+// 直线判断坐标
 const spotLineDistance = function (beginline: xy, endline: xy, node: xy): string {
   //直线由鼠标位置修改鼠标样式
   if (lineDistance(beginline, node) <= 8) {
@@ -30,7 +30,7 @@ const mousePointLine = function (
   beginLine: xy,
   endLine: xy,
   changeCursor: (cursor: string) => void,
-): void {
+): string {
   //直线鼠标指针所在地判断
   const node = spotLineDistance(beginLine, endLine, { x, y });
   switch (node) {
@@ -53,8 +53,9 @@ const mousePointLine = function (
       changeCursor('default');
     }
   }
+  return node;
 };
-
+// 判断形状坐标
 const boundary = function (changeCursor: (cursor: string) => void, { x, y }: xy, firstplot: xy, endplot: xy): string {
   //其他的所在地判断，随便修改鼠标样式
   const node = { x, y };
@@ -114,5 +115,78 @@ const boundary = function (changeCursor: (cursor: string) => void, { x, y }: xy,
     return 'default';
   }
 };
+// 直线的位置修改
+const linespotChange = function (stay: string, spotBegin: xy, spotEnd: xy, distance: xy): void {
+  switch (stay) {
+    case 'core': {
+      spotBegin.x += distance.x; //移动线段初始或者结束坐标
+      spotBegin.y += distance.y;
+      spotEnd.x += distance.x;
+      spotEnd.y += distance.y;
+      break;
+    }
+    case 'begin': {
+      spotBegin.x += distance.x;
+      spotBegin.y += distance.y;
+      break;
+    }
+    case 'end': {
+      spotEnd.x += distance.x;
+      spotEnd.y += distance.y;
+      break;
+    }
+  }
+};
+// 形状的位置修改
+const shapespotChange = function (stay: string, spotBegin: xy, spotEnd: xy, distance: xy): void {
+  switch (stay) {
+    case 'core':
+      spotBegin.x += distance.x;
+      spotBegin.y += distance.y;
+      spotEnd.x += distance.x;
+      spotEnd.y += distance.y;
+      break;
+    case 'top':
+      if (Math.abs(spotBegin.y + distance.y - spotEnd.y) <= 5) return;
+      spotBegin.y += distance.y;
+      break;
+    case 'lower':
+      if (Math.abs(spotEnd.y + distance.y - spotBegin.y) <= 5) return;
+      spotEnd.y += distance.y;
+      break;
+    case 'right':
+      if (Math.abs(spotEnd.x + distance.x - spotBegin.x) <= 5) return;
+      spotEnd.x += distance.x;
+      break;
+    case 'left':
+      if (Math.abs(spotBegin.x + distance.x - spotEnd.x) <= 5) return;
+      spotBegin.x += distance.x;
+      break;
+    case 'topleft':
+      if (Math.abs(spotBegin.y + distance.y - spotEnd.y) <= 5) return;
+      if (Math.abs(spotBegin.x + distance.x - spotEnd.x) <= 5) return;
+      spotBegin.x += distance.x;
+      spotBegin.y += distance.y;
+      break;
+    case 'lowerleft':
+      if (Math.abs(spotEnd.y + distance.y - spotBegin.y) <= 5) return;
+      if (Math.abs(spotBegin.x + distance.x - spotEnd.x) <= 5) return;
+      spotBegin.x += distance.x;
+      spotEnd.y += distance.y;
+      break;
+    case 'topright':
+      if (Math.abs(spotBegin.y + distance.y - spotEnd.y) <= 5) return;
+      if (Math.abs(spotEnd.x + distance.x - spotBegin.x) <= 5) return;
+      spotEnd.x += distance.x;
+      spotBegin.y += distance.y;
+      break;
+    case 'lowerright':
+      if (Math.abs(spotEnd.y + distance.y - spotBegin.y) <= 5) return;
+      if (Math.abs(spotEnd.x + distance.x - spotBegin.x) <= 5) return;
+      spotEnd.x += distance.x;
+      spotEnd.y += distance.y;
+      break;
+  }
+};
 
-export { spotLineDistance, mousePointLine, boundary };
+export { mousePointLine, boundary, linespotChange, shapespotChange };
