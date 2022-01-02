@@ -1,5 +1,5 @@
 import { lineDistance, pointToLine } from './basics-tool';
-import { xy, layer } from './Interface';
+import { xy } from './Interface';
 
 const spotLineDistance = function (beginline: xy, endline: xy, node: xy): string {
   //直线由鼠标位置修改鼠标样式
@@ -26,13 +26,13 @@ const spotLineDistance = function (beginline: xy, endline: xy, node: xy): string
 };
 
 const mousePointLine = function (
-  { layerX, layerY }: layer,
+  { x, y }: xy,
   beginLine: xy,
   endLine: xy,
   changeCursor: (cursor: string) => void,
 ): void {
   //直线鼠标指针所在地判断
-  const node = spotLineDistance(beginLine, endLine, { x: layerX, y: layerY });
+  const node = spotLineDistance(beginLine, endLine, { x, y });
   switch (node) {
     //线附近
     case 'core': {
@@ -55,19 +55,14 @@ const mousePointLine = function (
   }
 };
 
-const boundary = function (
-  changeCursor: (cursor: string) => void,
-  { layerX, layerY }: layer,
-  firstplot: xy,
-  endplot: xy,
-): string {
+const boundary = function (changeCursor: (cursor: string) => void, { x, y }: xy, firstplot: xy, endplot: xy): string {
   //其他的所在地判断，随便修改鼠标样式
-  const node = { x: layerX, y: layerY };
+  const node = { x, y };
   const minx = Math.min(firstplot.x, endplot.x),
     miny = Math.min(firstplot.y, endplot.y),
     maxx = Math.max(firstplot.x, endplot.x),
     maxy = Math.max(firstplot.y, endplot.y);
-  if (layerX >= minx - 8 && layerX <= maxx + 8 && layerY + 8 >= miny && layerY <= maxy + 8) {
+  if (x >= minx - 8 && x <= maxx + 8 && y + 8 >= miny && y <= maxy + 8) {
     //是否在范围内
     if (lineDistance(node, { x: minx, y: miny }) <= 8) {
       //到四点距离

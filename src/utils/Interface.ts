@@ -2,7 +2,7 @@
 interface canvasDProps {
   width: number;
   height: number;
-  tool: string;
+  tool: Type;
   bgColor: string;
   penSize: number;
   strokeColor: string;
@@ -47,11 +47,6 @@ interface xy {
   y: number;
 }
 
-interface layer {
-  layerY: number;
-  layerX: number;
-}
-
 interface drawType {
   x: number;
   y: number;
@@ -70,4 +65,52 @@ interface diff {
   negative: number;
 }
 
-export { canvasDProps, shapeType, props, imgd, imgM, xy, layer, drawType, trianglePlot, diff };
+type Type = 'pencil' | 'eraser' | 'line';
+type typeD = 'pencilDowm' | 'pencilDowm' | 'eraserMove' | 'eraserDowm';
+
+type typeBsCanvas =
+  | 'setCssText'
+  | 'setClassName'
+  | 'saveImag'
+  | 'initBoard'
+  | 'eliminate'
+  | 'drawImage'
+  | 'drawLine'
+  | 'drawDemoLine'
+  | 'lineBox'
+  | 'solidBox'
+  | 'dottedBox'
+  | 'Triangle'
+  | 'drawDiamond'
+  | 'text'
+  | 'paintB'
+  | 'getImageData';
+
+type typeMouse = {
+  pencilDowm: (e: MouseEvent) => void;
+  pencilMove: (e: MouseEvent) => void;
+  eraserMove: (e: MouseEvent) => void;
+  eraserDowm: (e: MouseEvent) => void;
+};
+type typeOpD = 'lineDowm';
+type typeOpMouse = {
+  lineDowm: (e: MouseEvent) => void;
+};
+
+export {
+  canvasDProps,
+  shapeType,
+  props,
+  imgd,
+  imgM,
+  xy,
+  drawType,
+  trianglePlot,
+  diff,
+  typeD,
+  typeMouse,
+  Type,
+  typeOpD,
+  typeOpMouse,
+  typeBsCanvas,
+};

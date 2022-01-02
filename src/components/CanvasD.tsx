@@ -1,8 +1,6 @@
-import { defineComponent,ref,provide,onMounted } from 'vue'
+import { defineComponent,ref,provide,onMounted, watch, PropType } from 'vue'
 import BaseCanvas from './BaseCanvas';
-import CanvasBasice from './CanvasBasice'
 import OperationCanvas from './OperationCanvas';
-import { xy } from '../utils/Interface'
 
 //项目住文件
 export default defineComponent({
@@ -51,50 +49,74 @@ export default defineComponent({
     },
   },
   setup(props, { slots, expose }) {
+
     const inTextarea = ref<HTMLTextAreaElement | null>();   //保存textarea
-		const frame = ref();    //保存画布框体
-    const baCanvas = ref(); //保存基础画布
+		const canvas = [ref(), ref()]; //保存基础与操作画布
     const opIndex = ref<number>(-1001);
     const baIndex = ref<number>(1000);
-    provide('setUp', props);
+		const ImageDatas: string[] = [];
+		const forwardData: string[] = [];
+		//type ppp = typeof props;
+    provide('item', props);
+		provide('ImageDatas', ImageDatas);
+		provide('forwardData', forwardData);
 
-    switch(props.tool){
-      case 'pickup':
-      case 'pencil':{
-        baIndex.value = 1000;
-        opIndex.value = -1001;
-      }
-      default: {
-        
-      }
-    }
+		// for(const key in props) {
+		// 	if (Object.prototype.hasOwnProperty.call(props, key)) {
+		// 		console.log(props[key as keyof canvasDProps], key);
+		// 	}
+		// }
+
+		function initTool (tool: string): void {
+			baIndex.value = 1000;
+			switch(tool){
+				case 'eraser':
+				case 'pencil':{
+					opIndex.value = -1001;
+					break;
+				}
+				case 'line':{
+					opIndex.value = 1001;
+					break;
+				}
+				default: {
+
+				}
+			}
+		}
+		//当工具更新时相应
+		watch(()=>props.tool, (newVal: string)=>{
+			initTool(newVal);
+		})
+
 
     onMounted(():void=>{
-			if (!inTextarea.value || !frame.value) return;
+			if (!inTextarea.value) return;
 			inTextarea.value.style.cssText = 'opacity: 0;z-index: -1001; position: absolute;';
-			frame.value.style.cssText = `width:${props.width}px;height:${props.height}px;`;
-    })
+			initTool(props.tool);
+		})
 
     expose({
       pickup: (spotX: number, spotY: number): string=>{
-        return baCanvas.value?.pickup({x: spotX, y: spotY})
+        return canvas[0].value?.pickup({x: spotX, y: spotY})
       },
       bucket: (x: number, y: number,intensity: number = 20, color: string = props.strokeColor): void=>{
-        baCanvas.value?.bucket({ x, y }, intensity, color);
+        canvas[0].value?.bucket({ x, y }, intensity, color);
       }
     })
 
-    //总共三层canvas背景、基础、操作，分别定义在不同的文件，textarea是用来输入文字的
+    //总共两层canvas有基础、操作，分别定义在不同的文件，textarea是用来输入文字的
     return () => (
-      <div ref={frame}>
+      <div style={{width:props.width+'px', height:props.height+'px'}}>
         { slots.default && slots.default() }
 
          <BaseCanvas
-          ref = {baCanvas}
+          ref={canvas[0]}
           zIndex={baIndex.value}
           ></BaseCanvas>
 
          <OperationCanvas
+				 	ref={canvas[1]}
           zIndex={opIndex.value}
           ></OperationCanvas>
 

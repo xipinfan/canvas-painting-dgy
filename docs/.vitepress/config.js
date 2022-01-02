@@ -1,8 +1,7 @@
 export default {
 	title: '组件库',
   description: '组件库',
-	base: ".",
-	mode: 'hash',
+	base: "/",
   themeConfig: {
     sidebar: {
 			'/': [

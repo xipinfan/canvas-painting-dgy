@@ -1,5 +1,5 @@
-import { defineComponent,ref,onMounted } from 'vue'
-import { layer, imgM, drawType, xy, trianglePlot } from '../utils/Interface';
+import { defineComponent,ref,onMounted, inject, watch } from 'vue'
+import { imgM, drawType, xy, trianglePlot, canvasDProps } from '../utils/Interface';
 import { paintBucket } from '../utils/canvas-tool'
 
 //基础canvas的定义
@@ -8,33 +8,40 @@ export default defineComponent({
   inheritAttrs:false,
   emits:['click','mousedown','mouseup','mouseleave','mousemove'],
   props: {
-    width:{
-      type:Number,
-      default:400
-    },
-    height:{
-      type:Number,
-      default:400
-    },
-    position:{
-      type:String,
-      default:'absolute'
-    },
     zIndex:{
       type:Number,
       default:0
-    }
+    },
   },
   components: {},
   setup(props, { expose,emit }) {
     const canvas = ref<HTMLCanvasElement | null>(null);
     const canvasCtx = ref<CanvasRenderingContext2D | null>(null);
 
+		const item: canvasDProps | null = inject('item') || null;
+    if(!item) return;
+		//修改canvas的基础设置
+		function changeConfig (newVal: canvasDProps ) {
+			if(canvasCtx.value === null) return;
+			canvasCtx.value.fillStyle = newVal.strokeColor;
+			canvasCtx.value.strokeStyle = newVal.strokeColor;
+			canvasCtx.value.lineWidth = newVal.penSize;
+		}
+
+		watch(item, (newVal)=>{
+			changeConfig(newVal);
+		})
+
+		watch(props, (newVal)=>{
+			setCssText(`position:absolute;z-index:${newVal.zIndex};`);
+		})
+
     onMounted((): void=>{
       if(!canvas.value)return;
-      setCssText(`position:${props.position};z-index:${props.zIndex};`);
-      canvasCtx.value = canvas.value.getContext('2d');
-    })
+      setCssText(`position:absolute;z-index:${props.zIndex};`);
+      canvasCtx.value = canvas.value.getContext('2d') as CanvasRenderingContext2D;
+			changeConfig(item);
+		})
     // 快速设定css
     const setCssText = function(text: string): void{
       if(!canvas.value)return;
@@ -61,6 +68,7 @@ export default defineComponent({
         }
       })
     }
+		//绘制矩形
 		const fillRect = function( beginX: number, beginY: number, endX: number, endY: number, color: string ): void {
 			if(!canvasCtx.value)return;
 			canvasCtx.value.save();
@@ -71,15 +79,14 @@ export default defineComponent({
     // 重置画布
     const initBoard = function (color: string): void {
 			if(!canvasCtx.value)return;
-      canvasCtx.value.clearRect( 0, 0, props.width, props.height );
+      canvasCtx.value.clearRect( 0, 0, item.width, item.height );
       if(color){
-        fillRect ( 0, 0, props.width, props.height, color );
+        fillRect ( 0, 0, item.width, item.height, color );
       }
     }
 		// 橡皮擦
 		const eliminate = function ( color: string, layers:xy, eraserSize: number ): void {
 			if (!canvasCtx.value) return;
-      
 			if (!color) {
 				canvasCtx.value.clearRect( layers.x, layers.y, eraserSize, eraserSize )
 			} else {
@@ -142,14 +149,14 @@ export default defineComponent({
       canvasCtx.value.strokeStyle = 'rgba(131,191,236)';
       canvasCtx.value.lineWidth = 1;
       canvasCtx.value.strokeRect(x, y, w, h);
-      const nodeLine:xy = { x: w/2 + x, y: h/2 + y };
-      const path:xy[] = [
+      const nodeLine: xy = { x: w/2 + x, y: h/2 + y };
+      const path: xy[] = [
         { x:beginLine.x, y:beginLine.y }, { x:endLine.x, y:endLine.y },
         { x:endLine.x, y:beginLine.y }, { x:beginLine.x, y:endLine.y },
         { x:beginLine.x, y:nodeLine.y }, { x:endLine.x, y:nodeLine.y },
         { x:nodeLine.x, y:beginLine.y }, { x:nodeLine.x, y:endLine.y },
       ];
-      path.forEach( (event:xy): void => {
+      path.forEach( (event: xy): void => {
         if (!canvasCtx.value) return;
         canvasCtx.value.strokeStyle = 'rgba(117,117,117)';
         canvasCtx.value.strokeRect(event.x-1, event.y-1, 3, 3);
@@ -158,7 +165,7 @@ export default defineComponent({
       })
       canvasCtx.value.restore();
     }
-    //判断绘制是否填充
+    // 判断绘制是否填充
     function triangleStatus (imageStatus: string): void {
       if (!canvasCtx.value) return;
       if(imageStatus === 'stroke'){
@@ -168,7 +175,7 @@ export default defineComponent({
         canvasCtx.value.fill();
       }
     }
-    //绘制三角形使用
+    // 绘制三角形使用
     function triangleDraw (plot: trianglePlot, imageStatus: string) : void {
       if (!canvasCtx.value) return;
       canvasCtx.value.beginPath();
@@ -178,7 +185,7 @@ export default defineComponent({
       canvasCtx.value.closePath();
       triangleStatus(imageStatus);
     }
-    //三角形
+    // 三角形
     const Triangle = function (firstplot: xy, endplot: xy, type: string = 'solid', imageStatus: string):void {
       let beginPlot = {x:firstplot.x, y:firstplot.y};
       if (type === 'isosceles') {
@@ -190,15 +197,15 @@ export default defineComponent({
           end: {x:endplot.x, y:endplot.y},
         }, imageStatus);
     }
-    //菱形
+    // 菱形
     const drawDiamond = function (firstplot: xy, endplot: xy, imageStatus: string) {
       if (!canvasCtx.value) return;
-      const mid:xy = {
+      const mid: xy = {
         x: (firstplot.x + endplot.x)/2,
         y: (firstplot.y + endplot.y)/2
       }
-      const x = (endplot.x - firstplot.x)/2;
-      const y = (endplot.y - firstplot.y)/2;
+      const x: number = (endplot.x - firstplot.x)/2;
+      const y: number = (endplot.y - firstplot.y)/2;
       canvasCtx.value.beginPath();
       canvasCtx.value.moveTo( mid.x + x , mid.y );
       canvasCtx.value.lineTo( mid.x  , mid.y - y );
@@ -206,8 +213,8 @@ export default defineComponent({
       canvasCtx.value.lineTo( mid.x  , mid.y + y );
       canvasCtx.value.closePath();
       triangleStatus(imageStatus);
-    } 
-    //文本
+    }
+    // 文本
     const text = function (textDottedLine: imgM, value: string, fontType: string, textStyle: boolean, fontSize: number): number {
       if (!canvasCtx.value) return 0;
       let index: number = 0;
@@ -230,11 +237,11 @@ export default defineComponent({
         }
       }
       canvasCtx.value.restore();
-      return textQueue.length * fontSize;  //判断是否需要伸长框体
+      return textQueue.length * fontSize;  // 判断是否需要伸长框体
     }
-    //获取canvas的Imagedata值
+    // 获取canvas的Imagedata值
     const getImageData = function (firstplot: xy, endplot: xy): ImageData | undefined {
-      if(canvasCtx.value === null)return;
+			if(canvasCtx.value === null)return;
       return canvasCtx.value.getImageData(
         firstplot.x,
         firstplot.y,
@@ -242,13 +249,15 @@ export default defineComponent({
         endplot.y
       );
     }
+		// 油漆桶
     const paintB = function (spots: xy,intensity: number, color: string): void {
       if(canvasCtx.value === null)return;
-      const ImageData:ImageData = getImageData({x:0, y:0}, {x:props.width, y:props.height}) as ImageData;
+			const ImageData: ImageData = getImageData({x:0, y:0}, {x:item.width, y:item.height}) as ImageData;
       paintBucket(ImageData, spots.x, spots.y, color, intensity);
       canvasCtx.value.putImageData(ImageData, 0, 0);
     }
-    //统一调用事件响应
+
+    // 统一调用事件响应
     const op = function (type: string):(payload: MouseEvent) => void {
       return function(payload: MouseEvent) {
         emit(type as "click" | "mousedown" | "mouseup" | "mouseleave" | "mousemove", payload);
@@ -279,8 +288,8 @@ export default defineComponent({
       <>
         <canvas
         ref={canvas}
-        height={props.height}
-        width={props.width}
+        height={item.height}
+        width={item.width}
         onClick={op('click')}
         onMousedown={op('mousedown')}
         onMouseup={op('mouseup')}
