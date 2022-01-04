@@ -1,4 +1,5 @@
 //props的接口定义
+import { linespotChange, shapespotChange } from '../utils/canvas-cursor';
 interface imgRe {
   width: number;
   height: number;
@@ -79,15 +80,21 @@ type typeMouse = {
   eraserMove: (e: MouseEvent) => void;
   eraserDowm: (e: MouseEvent) => void;
 };
-type typeOpD = 'lineMove';
+type typeOpD = 'lineMove' | 'lineDraw' | 'rectangleMove' | 'rectangleDraw';
 type typeOpMouse = {
   e: xy;
   mobile: xy;
   spotNode: string;
+  linespotChange: typeof linespotChange;
+  shapespotChange: typeof shapespotChange;
   lineMove: () => void;
-  lineBaseMove: () => void;
+  move: () => void;
   lineDraw: () => void;
+  rectangleMove: () => void;
+  //rectangleBaseMove: () => void;
+  rectangleDraw: () => void;
 };
+type typeShare = 'linespotChange' | 'shapespotChange';
 
 export {
   shapeType,
@@ -104,4 +111,5 @@ export {
   typeOpD,
   typeOpMouse,
   typeBsCanvas,
+  typeShare,
 };

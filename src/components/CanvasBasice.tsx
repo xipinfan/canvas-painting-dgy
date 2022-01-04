@@ -135,16 +135,11 @@ export default defineComponent({
       canvasCtx.value.restore();
 		}
     // 矩形函数
-    const solidBox = function (beginLine: xy, endLine: xy, imageStatus: string): void {
-      if (!canvasCtx.value) return;
-      const minx: number = Math.min(beginLine.x, endLine.x);
-      const miny: number = Math.min(beginLine.y, endLine.y);
-      const maxx: number = Math.max(beginLine.x, endLine.x);
-      const maxy: number = Math.max(beginLine.y, endLine.y);
-      if (imageStatus === 'stroke') {
-        canvasCtx.value.strokeRect(minx, miny, maxx, maxy);
+    const solidBox = function ({ x:minx, y:miny }: xy, { x:maxx, y:maxy }: xy): void {
+      if (item.shapeStatu === 'stroke') {
+        canvasCtx.value?.strokeRect(minx, miny, maxx - minx, maxy - miny);
       } else {
-        canvasCtx.value.fillRect(minx, miny, maxx, maxy);
+        canvasCtx.value?.fillRect(minx, miny, maxx - minx, maxy - miny);
       }
     }
     // 虚线提示框

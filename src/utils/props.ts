@@ -39,6 +39,10 @@ const propsCanvasD = {
     type: String,
     default: '400',
   },
+  shapeStatu: {
+    type: String,
+    default: 'stroke',
+  },
 };
 
 export default propsCanvasD;

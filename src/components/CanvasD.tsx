@@ -23,17 +23,13 @@ export default defineComponent({
 		function initTool (tool: string): void {
 			baIndex.value = 1000;
 			switch(tool){
-				case 'eraser':
-				case 'pencil':{
-					opIndex.value = -1001;
-					break;
-				}
-				case 'line':{
+        case 'rectangle':
+				case 'line': {
 					opIndex.value = 1001;
 					break;
 				}
 				default: {
-
+          opIndex.value = -1001;
 				}
 			}
 		}

@@ -7,7 +7,7 @@ export default defineComponent({
     const canvas = ref();
     const height = ref<number>(500);
     const width = ref<number>(500);
-		const tool = ref<string>('line');
+		const tool = ref<string>('rectangle');
 		const penSize = ref<number>(9);
 		const strokeColor = ref<string>('#000000')
     onMounted( () => {
