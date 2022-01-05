@@ -23,6 +23,7 @@ export default defineComponent({
 		function initTool (tool: string): void {
 			baIndex.value = 1000;
 			switch(tool){
+        case 'round':
         case 'rectangle':
 				case 'line': {
 					opIndex.value = 1001;

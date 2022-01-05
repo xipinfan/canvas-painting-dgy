@@ -85,7 +85,14 @@ export default defineComponent({
 			},
 			rectangleDraw: function (): void {
 				bus.bsCanvasFunction('solidBox', spotBegin, spotEnd);
-			}
+			},
+			roundMove: function (): void {
+				opCanvas.value?.solidRound( spotBegin, spotEnd );
+				opCanvas.value?.dottedBox( spotBegin, spotEnd );
+			},
+			roundDraw: function (): void {
+				bus.bsCanvasFunction('solidRound', spotBegin, spotEnd);
+			},
 		}
 
 		// 通过对象映射调用数组

@@ -1,6 +1,6 @@
-import { defineComponent,ref,onMounted, inject, watch } from 'vue'
+import { defineComponent,ref,onMounted, inject, watch } from 'vue';
 import { imgM, drawType, xy, trianglePlot } from '../utils/Interface';
-import { paintBucket } from '../utils/canvas-tool'
+import { paintBucket, ellipse, ellipsefill } from '../utils/canvas-tool';
 import OperationCanvas from './OperationCanvas';
 
 //基础canvas的定义
@@ -171,24 +171,36 @@ export default defineComponent({
       })
       canvasCtx.value.restore();
     }
+    const solidRound = function (firstplot: xy, endplot: xy): void {
+      const x = (firstplot.x+endplot.x)/2;
+      const y = (firstplot.y+endplot.y)/2;
+      const radiusX = (endplot.x - firstplot.x)/2;
+      const radiusY = (endplot.y - firstplot.y)/2;
+      canvasCtx.value?.beginPath();
+      if (item.shapeStatu === 'stroke') {
+        ellipse(canvasCtx.value as CanvasRenderingContext2D, x, y, radiusX, radiusY, 0, 0, Math.PI*2,false)
+      } else {
+        ellipsefill(canvasCtx.value as CanvasRenderingContext2D, x, y, radiusX, radiusY, 0, 0, Math.PI*2,false)
+      }
+      canvasCtx.value?.stroke();
+      canvasCtx.value?.closePath();
+    }
     // 判断绘制是否填充
     function triangleStatus (imageStatus: string): void {
-      if (!canvasCtx.value) return;
       if(imageStatus === 'stroke'){
-        canvasCtx.value.stroke();
+        canvasCtx.value?.stroke();
       }
       else{
-        canvasCtx.value.fill();
+        canvasCtx.value?.fill();
       }
     }
     // 绘制三角形使用
     function triangleDraw (plot: trianglePlot, imageStatus: string) : void {
-      if (!canvasCtx.value) return;
-      canvasCtx.value.beginPath();
-      canvasCtx.value.moveTo(plot.begin.x, plot.begin.y);
-      canvasCtx.value.lineTo(plot.mid.x, plot.mid.y);
-      canvasCtx.value.lineTo(plot.end.x, plot.end.y);
-      canvasCtx.value.closePath();
+      canvasCtx.value?.beginPath();
+      canvasCtx.value?.moveTo(plot.begin.x, plot.begin.y);
+      canvasCtx.value?.lineTo(plot.mid.x, plot.mid.y);
+      canvasCtx.value?.lineTo(plot.end.x, plot.end.y);
+      canvasCtx.value?.closePath();
       triangleStatus(imageStatus);
     }
     // 三角形
@@ -285,6 +297,7 @@ export default defineComponent({
       dottedBox,     // 虚线提示框
       Triangle,      // 三角形
       drawDiamond,   // 菱形
+      solidRound,    // 圆形
       text,          // 文本
       paintB,        // 油漆桶
       getImageData,  // 获取imagedata
