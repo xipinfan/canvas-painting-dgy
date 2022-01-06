@@ -25,6 +25,9 @@ export default defineComponent({
 			switch(tool){
         case 'round':
         case 'rectangle':
+        case 'rightTriangle':
+        case 'isosceles':
+        case 'diamond':
 				case 'line': {
 					opIndex.value = 1001;
 					break;

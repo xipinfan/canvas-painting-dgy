@@ -7,7 +7,7 @@ export default defineComponent({
     const canvas = ref();
     const height = ref<number>(500);
     const width = ref<number>(500);
-		const tool = ref<string>('round');
+		const tool = ref<string>('diamond');
 		const penSize = ref<number>(9);
 		const strokeColor = ref<string>('#000000')
     onMounted( () => {
@@ -20,7 +20,6 @@ export default defineComponent({
 			penSize.value = 6;
 			strokeColor.value = 'blue'
 
-			console.log('????')
 		}
     return () => (
 			<>

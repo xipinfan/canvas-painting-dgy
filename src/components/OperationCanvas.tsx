@@ -93,6 +93,27 @@ export default defineComponent({
 			roundDraw: function (): void {
 				bus.bsCanvasFunction('solidRound', spotBegin, spotEnd);
 			},
+			rightTriangleMove: function(): void {
+				opCanvas.value?.Triangle( spotBegin, spotEnd, 'solid' );
+				opCanvas.value?.dottedBox( spotBegin, spotEnd );
+			},
+			rightTriangleDraw: function(): void {
+				bus.bsCanvasFunction('Triangle', spotBegin, spotEnd, 'solid');
+			},
+			isoscelesMove: function(): void {
+				opCanvas.value?.Triangle( spotBegin, spotEnd, 'isosceles' );
+				opCanvas.value?.dottedBox( spotBegin, spotEnd );
+			},
+			isoscelesDraw: function(): void {
+				bus.bsCanvasFunction('Triangle', spotBegin, spotEnd, 'isosceles');
+			},
+			diamondMove: function(): void {
+				opCanvas.value?.drawDiamond( spotBegin, spotEnd );
+				opCanvas.value?.dottedBox( spotBegin, spotEnd );
+			},
+			diamondDraw: function(): void {
+				bus.bsCanvasFunction('drawDiamond', spotBegin, spotEnd);
+			}
 		}
 
 		// 通过对象映射调用数组

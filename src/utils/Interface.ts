@@ -53,7 +53,7 @@ interface diff {
   negative: number;
 }
 
-type Type = 'pencil' | 'eraser' | 'line' | 'round' | 'rectangle';
+type Type = 'pencil' | 'eraser' | 'line' | 'round' | 'rectangle' | 'rightTriangle' | 'isosceles' | 'diamond';
 type typeD = 'pencilDowm' | 'pencilDowm' | 'eraserMove' | 'eraserDowm';
 
 type typeBsCanvas =
@@ -81,7 +81,19 @@ type typeMouse = {
   eraserMove: (e: MouseEvent) => void;
   eraserDowm: (e: MouseEvent) => void;
 };
-type typeOpD = 'lineMove' | 'lineDraw' | 'rectangleMove' | 'rectangleDraw';
+
+type typeOpD =
+  | 'lineMove'
+  | 'lineDraw'
+  | 'rectangleMove'
+  | 'rectangleDraw'
+  | 'rightTriangleMove'
+  | 'rightTriangleDraw'
+  | 'isoscelesMove'
+  | 'isoscelesDraw'
+  | 'diamondMove'
+  | 'diamondDraw';
+
 type typeOpMouse = {
   e: xy;
   mobile: xy;
@@ -96,7 +108,14 @@ type typeOpMouse = {
   rectangleDraw: () => void;
   roundMove: () => void;
   roundDraw: () => void;
+  rightTriangleMove: () => void;
+  rightTriangleDraw: () => void;
+  isoscelesMove: () => void;
+  isoscelesDraw: () => void;
+  diamondMove: () => void;
+  diamondDraw: () => void;
 };
+
 type typeShare = 'linespotChange' | 'shapespotChange';
 
 export {

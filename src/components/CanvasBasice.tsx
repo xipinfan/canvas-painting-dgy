@@ -204,7 +204,7 @@ export default defineComponent({
       triangleStatus(imageStatus);
     }
     // 三角形
-    const Triangle = function (firstplot: xy, endplot: xy, type: string = 'solid', imageStatus: string):void {
+    const Triangle = function (firstplot: xy, endplot: xy, type: string = 'solid'):void {
       let beginPlot = {x:firstplot.x, y:firstplot.y};
       if (type === 'isosceles') {
         beginPlot.x = (firstplot.x + endplot.x)/2;
@@ -213,10 +213,10 @@ export default defineComponent({
           begin: beginPlot,
           mid: {x:firstplot.x, y:endplot.y},
           end: {x:endplot.x, y:endplot.y},
-        }, imageStatus);
+        }, item.shapeStatu);
     }
     // 菱形
-    const drawDiamond = function (firstplot: xy, endplot: xy, imageStatus: string) {
+    const drawDiamond = function (firstplot: xy, endplot: xy) {
       if (!canvasCtx.value) return;
       const mid: xy = {
         x: (firstplot.x + endplot.x)/2,
@@ -230,7 +230,7 @@ export default defineComponent({
       canvasCtx.value.lineTo( mid.x - x , mid.y );
       canvasCtx.value.lineTo( mid.x  , mid.y + y );
       canvasCtx.value.closePath();
-      triangleStatus(imageStatus);
+      triangleStatus(item.shapeStatu);
     }
     // 文本
     const text = function (textDottedLine: imgM, value: string, fontType: string, textStyle: boolean, fontSize: number): number {
