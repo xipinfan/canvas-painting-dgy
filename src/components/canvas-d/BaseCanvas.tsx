@@ -1,9 +1,8 @@
 import { defineComponent,inject,ref, onMounted, watch } from 'vue'
 import CanvasBasice from './CanvasBasice'
-import { route } from '../utils/basics-tool'
-import { xy, typeD, typeMouse, typeBsCanvas } from '../utils/Interface'
-import { bus } from '../libs/bus'
-import OperationCanvas from './OperationCanvas';
+import { route } from '../../utils/basics-tool'
+import { xy, typeD, typeMouse, typeBsCanvas } from '../../utils/Interface'
+import { bus } from '../../libs/bus'
 
 //基础画布
 export default defineComponent({
@@ -20,7 +19,7 @@ export default defineComponent({
     let state: boolean = false;
     const lastCoordinate: xy = { x: 0, y: 0 };
     const bsCanvas= ref<typeof CanvasBasice | null>(null);
-    const item: typeof OperationCanvas | null = inject('item') || null;
+    const item: any = inject('item');
     if(!item) return;
 
 		//具体需要调用的数组

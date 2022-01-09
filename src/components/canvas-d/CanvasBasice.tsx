@@ -1,7 +1,6 @@
 import { defineComponent,ref,onMounted, inject, watch } from 'vue';
-import { imgM, drawType, xy, trianglePlot } from '../utils/Interface';
-import { paintBucket, ellipse, ellipsefill } from '../utils/canvas-tool';
-import OperationCanvas from './OperationCanvas';
+import { imgM, drawType, xy, trianglePlot } from '../../utils/Interface';
+import { paintBucket, ellipse, ellipsefill } from '../../utils/canvas-tool';
 
 //基础canvas的定义
 export default defineComponent({
@@ -19,10 +18,10 @@ export default defineComponent({
     const canvas = ref<HTMLCanvasElement | null>(null);
     const canvasCtx = ref<CanvasRenderingContext2D | null>(null);
 
-		const item: typeof OperationCanvas | null = inject('item') || null;
+		const item: any = inject('item') || null;
     if(!item) return;
 		//修改canvas的基础设置
-		function changeConfig (newVal: typeof OperationCanvas ) {
+		function changeConfig (newVal: any ): void {
 			if(canvasCtx.value === null) return;
 			canvasCtx.value.fillStyle = newVal.strokeColor;
 			canvasCtx.value.strokeStyle = newVal.strokeColor;

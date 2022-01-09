@@ -1,3 +1,3 @@
-import CanvasD from './components/CanvasD';
+import CanvasD from './components/canvas-d/CanvasD';
 
 export { CanvasD };

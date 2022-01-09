@@ -1,9 +1,9 @@
 import { defineComponent,inject,ref, onMounted } from 'vue'
 import CanvasBasice from './CanvasBasice'
-import { typeOpD, typeOpMouse, typeShare, xy } from '../utils/Interface'
-import { bus } from '../libs/bus'
-import { mousePointLine, boundary, linespotChange, shapespotChange } from '../utils/canvas-cursor'
-import OperationCanvas from './OperationCanvas';
+import { typeOpD, typeOpMouse, typeShare, xy } from '../../utils/Interface'
+import { bus } from '../../libs/bus'
+import { mousePointLine, boundary, linespotChange, shapespotChange } from '../../utils/canvas-cursor'
+
 //操作画布
 export default defineComponent({
   inheritAttrs: false,
@@ -19,8 +19,8 @@ export default defineComponent({
 		let state: boolean = false;		// 判断当前鼠标是否按下
 		let controlnode: boolean = false;		// 判断当前初始绘制是否完成
     const opCanvas = ref<typeof CanvasBasice | null>(null);		// 主标签获取
-    const item: typeof OperationCanvas | null = inject('item') || null;		// 获取之前保存的props
-		if(!item)return;
+    const tool: string | undefined = inject('tool');		// 获取之前保存的props
+		if(!tool)return;
 		const spotBegin: xy = {		//绘制的初始坐标
 			x:0, y:0
 		}
@@ -40,7 +40,7 @@ export default defineComponent({
 		}
 		// 获取当前鼠标在形状何处
 		const cursorJudge = function(e: MouseEvent): string {
-			if (item.tool === 'line') {
+			if (tool === 'line') {
 				return mousePointLine( { x: e.offsetX, y: e.offsetY }, spotBegin, spotEnd, changeCursor );
 			} else {
 				return boundary( changeCursor,{ x:e.offsetX, y: e.offsetY }, spotBegin, spotEnd );
@@ -66,7 +66,7 @@ export default defineComponent({
 			linespotChange,
 			shapespotChange,
 			move: function () :void {
-				if (item.tool === 'line') {		//直线移动判断与其他的不同
+				if (tool === 'line') {		//直线移动判断与其他的不同
 					spotChange('line');	
 				} else {
 					spotChange('shape');	
@@ -121,12 +121,12 @@ export default defineComponent({
 			// 实现判断当前映射是否在对象内
 			// if(Object.prototype.hasOwnProperty.call(mouse, item.tool + name)){
 			[ mouse.e.x, mouse.e.y ] = [ e.offsetX, e.offsetY ];
-			if (item.tool !== 'line') {
+			if (tool !== 'line') {
 				position();
 			}
 			console.log(spotBegin, spotEnd)
-			if (mouse.hasOwnProperty(item.tool + name)) {
-				mouse[(item.tool + name) as typeOpD]();
+			if (mouse.hasOwnProperty(tool + name)) {
+				mouse[(tool + name) as typeOpD]();
 			}
 		}
 

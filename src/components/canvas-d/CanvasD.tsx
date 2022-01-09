@@ -1,5 +1,5 @@
 import { defineComponent,ref,provide,onMounted, watch, PropType } from 'vue'
-import propsCanvasD from '../utils/props';
+import propsCanvasD from './props';
 import BaseCanvas from './BaseCanvas';
 import OperationCanvas from './OperationCanvas';
 
@@ -17,6 +17,7 @@ export default defineComponent({
 		const ImageDatas: string[] = [];
 		const forwardData: string[] = [];
     provide('item', props);
+    provide('tool', props.tool);
 		provide('ImageDatas', ImageDatas);
 		provide('forwardData', forwardData);
 
