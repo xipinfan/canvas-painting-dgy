@@ -185,8 +185,8 @@ export default defineComponent({
       canvasCtx.value?.closePath();
     }
     // 判断绘制是否填充
-    function triangleStatus (imageStatus: string): void {
-      if(imageStatus === 'stroke'){
+    function triangleStatus (): void {
+      if(item.shapeStatu === 'stroke'){
         canvasCtx.value?.stroke();
       }
       else{
@@ -194,13 +194,13 @@ export default defineComponent({
       }
     }
     // 绘制三角形使用
-    function triangleDraw (plot: trianglePlot, imageStatus: string) : void {
+    function triangleDraw (plot: trianglePlot) : void {
       canvasCtx.value?.beginPath();
       canvasCtx.value?.moveTo(plot.begin.x, plot.begin.y);
       canvasCtx.value?.lineTo(plot.mid.x, plot.mid.y);
       canvasCtx.value?.lineTo(plot.end.x, plot.end.y);
       canvasCtx.value?.closePath();
-      triangleStatus(imageStatus);
+      triangleStatus();
     }
     // 三角形
     const Triangle = function (firstplot: xy, endplot: xy, type: string = 'solid'):void {
@@ -212,7 +212,7 @@ export default defineComponent({
           begin: beginPlot,
           mid: {x:firstplot.x, y:endplot.y},
           end: {x:endplot.x, y:endplot.y},
-        }, item.shapeStatu);
+        });
     }
     // 菱形
     const drawDiamond = function (firstplot: xy, endplot: xy) {
@@ -229,16 +229,17 @@ export default defineComponent({
       canvasCtx.value.lineTo( mid.x - x , mid.y );
       canvasCtx.value.lineTo( mid.x  , mid.y + y );
       canvasCtx.value.closePath();
-      triangleStatus(item.shapeStatu);
+      triangleStatus();
     }
     // 文本
-    const text = function (textDottedLine: imgM, value: string, fontType: string, textStyle: boolean, fontSize: number): number {
+    const text = function (textDottedLine: imgM, value: string): number {
+      console.log(value)
       if (!canvasCtx.value) return 0;
       let index: number = 0;
       const textQueue: string[] = [''];
       const textWidth: number = Math.abs(textDottedLine.x2 - textDottedLine.x1);
       canvasCtx.value.save();
-      canvasCtx.value.font = fontType;
+      canvasCtx.value.font = item.fontWeight + ' ' + item.fontSize + 'px ' + item.fontFamily;;
       for(let i of value){
         if (canvasCtx.value.measureText(textQueue[index] + i).width > textWidth || i === '\n') {
           index += 1;
@@ -247,14 +248,14 @@ export default defineComponent({
         if(i != '\n')textQueue[index] += i;
       }
       for (let i = 0; i < textQueue.length; i++) {
-        if (textStyle) {
-          canvasCtx.value.fillText(textQueue[i], textDottedLine.x1, textDottedLine.y1 + fontSize * (i+1));
+        if (item.shapeStatu) {
+          canvasCtx.value.fillText(textQueue[i], textDottedLine.x1, textDottedLine.y1 + item.fontSize * (i+1));
         } else {
-          canvasCtx.value.strokeText(textQueue[i], textDottedLine.x1, textDottedLine.y1 + fontSize * (i+1));
+          canvasCtx.value.strokeText(textQueue[i], textDottedLine.x1, textDottedLine.y1 + item.fontSize * (i+1));
         }
       }
       canvasCtx.value.restore();
-      return textQueue.length * fontSize;  // 判断是否需要伸长框体
+      return textQueue.length * item.fontSize;  // 判断是否需要伸长框体
     }
     // 获取canvas的Imagedata值
     const getImageData = function (firstplot: xy, endplot: xy): ImageData | undefined {

@@ -14,6 +14,7 @@ export default defineComponent({
 		const canvas = [ref(), ref()]; //保存基础与操作画布
     const opIndex = ref<number>(-1001);
     const baIndex = ref<number>(1000);
+    const indexText = ref<string>('');
 		const ImageDatas: string[] = [];
 		const forwardData: string[] = [];
     provide('item', props);
@@ -24,6 +25,7 @@ export default defineComponent({
 		function initTool (tool: string): void {
 			baIndex.value = 1000;
 			switch(tool){
+        case 'text':
         case 'round':
         case 'rectangle':
         case 'rightTriangle':
@@ -43,20 +45,23 @@ export default defineComponent({
 			initTool(newVal);
 		})
 
-
+    const getFocus = function () {
+      inTextarea.value?.focus();
+    }
     onMounted(():void=>{
 			if (!inTextarea.value) return;
 			inTextarea.value.style.cssText = 'opacity: 0;z-index: -1001; position: absolute;';
-			initTool(props.tool);
+      initTool(props.tool);
 		})
 
     expose({
-      pickup: (spotX: number, spotY: number): string=>{
-        return canvas[0].value?.pickup({x: spotX, y: spotY})
+      pickup: (): string=>{
+        return canvas[0].value?.pickup.value;
       },
       bucket: (x: number, y: number,intensity: number = 20, color: string = props.strokeColor): void=>{
         canvas[0].value?.bucket({ x, y }, intensity, color);
-      }
+      },
+      getFocus,
     })
 
     //总共两层canvas有基础、操作，分别定义在不同的文件，textarea是用来输入文字的
@@ -70,11 +75,16 @@ export default defineComponent({
           ></BaseCanvas>
 
          <OperationCanvas
+          inTextarea={indexText.value}
 				 	ref={canvas[1]}
           zIndex={opIndex.value}
+          getFocus={getFocus}
           ></OperationCanvas>
 
-         <textarea ref={inTextarea}></textarea>
+         <textarea 
+          ref={inTextarea}
+          v-model={indexText.value}
+          ></textarea>
       </div>
     )
   }

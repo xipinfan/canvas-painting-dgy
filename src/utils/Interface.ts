@@ -53,8 +53,19 @@ interface diff {
   negative: number;
 }
 
-type Type = 'pencil' | 'eraser' | 'line' | 'round' | 'rectangle' | 'rightTriangle' | 'isosceles' | 'diamond';
-type typeD = 'pencilDowm' | 'pencilDowm' | 'eraserMove' | 'eraserDowm';
+type Type =
+  | 'pickup'
+  | 'pencil'
+  | 'eraser'
+  | 'line'
+  | 'round'
+  | 'rectangle'
+  | 'rightTriangle'
+  | 'isosceles'
+  | 'diamond'
+  | 'text';
+
+type typeD = 'pencilDowm' | 'pencilDowm' | 'eraserMove' | 'eraserDowm' | 'pickupDowm';
 
 type typeBsCanvas =
   | 'setCssText'
@@ -80,6 +91,7 @@ type typeMouse = {
   pencilMove: (e: MouseEvent) => void;
   eraserMove: (e: MouseEvent) => void;
   eraserDowm: (e: MouseEvent) => void;
+  pickupDowm: (e: MouseEvent) => void;
 };
 
 type typeOpD =
@@ -92,7 +104,10 @@ type typeOpD =
   | 'isoscelesMove'
   | 'isoscelesDraw'
   | 'diamondMove'
-  | 'diamondDraw';
+  | 'diamondDraw'
+  | 'textMove'
+  | 'textDraw'
+  | 'textLeave';
 
 type typeOpMouse = {
   e: xy;
@@ -114,6 +129,9 @@ type typeOpMouse = {
   isoscelesDraw: () => void;
   diamondMove: () => void;
   diamondDraw: () => void;
+  textMove: () => void;
+  textDraw: () => void;
+  textLeave: () => void;
 };
 
 type typeShare = 'linespotChange' | 'shapespotChange';

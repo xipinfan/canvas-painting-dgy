@@ -44,8 +44,16 @@ export default defineComponent({
 			},
 			eraserMove: function (e: MouseEvent): void {
 				bsCanvas.value?.eliminate(item.bgColor, { x: e.offsetX, y: e.offsetY }, item.eraserSize);
-			}
-
+			},
+      pickupDowm: function (e: MouseEvent): void {
+        const ImgD: ImageData = bsCanvas.value?.getImageData({x:e.offsetX, y:e.offsetY}, {x: 1, y: 1});
+        const datas: string[] = [...ImgD.data].map((num:number): string=>{
+          let Snum = num.toString(16);
+          if(Snum.length < 2) Snum = '0' + Snum;
+          return Snum;
+        });
+        pickup.value = `#${datas[0]}${datas[1]}${datas[2]}`;
+      },
 		}
 
 		//通过对象映射调用数组
@@ -73,15 +81,7 @@ export default defineComponent({
     }
 
     //拾色器函数
-    const pickup = function (spots: xy): string {
-      const ImgD: ImageData = bsCanvas.value?.getImageData(spots, {x: 1, y: 1});
-      const datas: string[] = [...ImgD.data].map((num:number): string=>{
-        let Snum = num.toString(16);
-        if(Snum.length < 2) Snum = '0' + Snum;
-        return Snum;
-      });
-      return `#${datas[0]}${datas[1]}${datas[2]}`;
-    }
+    const pickup = ref<string>('');
     //油漆桶
     const bucket = function (...buckets: any[]): void {
       bsCanvas.value?.paintB.apply(bsCanvas.value, buckets);
