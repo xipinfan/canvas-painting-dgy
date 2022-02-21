@@ -2,14 +2,12 @@ import { reactive } from 'vue';
 import { typeBsCanvas } from '../utils/Interface';
 type bustype = {
   bsCanvasFunction: (type: typeBsCanvas, ...parameters: any[]) => void;
-  middleCanvas: HTMLCanvasElement;
-  middleCanvasCtx: CanvasRenderingContext2D | null;
+  savemiddle: () => Promise<boolean>;
+  middleImage: HTMLImageElement;
 };
 
 export const bus: bustype = reactive({
   bsCanvasFunction: (type: typeBsCanvas, ...parameters: any[]) => null,
-  middleCanvas: document.createElement('canvas'),
-  middleCanvasCtx: null,
+  savemiddle: () => Promise.resolve(true),
+  middleImage: new Image(),
 });
-
-bus.middleCanvasCtx = bus.middleCanvas.getContext('2d');

@@ -1,6 +1,7 @@
-import { defineComponent,ref,provide,onMounted, watch, PropType } from 'vue'
+import { defineComponent,ref,provide,onMounted, watch, PropType, nextTick } from 'vue'
 import propsCanvasD from './props';
 import BaseCanvas from './BaseCanvas';
+import { bus } from '../../libs/bus';
 import OperationCanvas from './OperationCanvas';
 
 //项目住文件
@@ -22,7 +23,7 @@ export default defineComponent({
 		provide('ImageDatas', ImageDatas);
 		provide('forwardData', forwardData);
 
-		function initTool (tool: string): void {
+		async function initTool (tool: string): Promise<void> {
 			baIndex.value = 1000;
 			switch(tool){
         case 'text':
@@ -30,6 +31,7 @@ export default defineComponent({
         case 'rectangle':
         case 'rightTriangle':
         case 'isosceles':
+        case 'shear':
         case 'diamond':
 				case 'line': {
 					opIndex.value = 1001;
@@ -39,6 +41,11 @@ export default defineComponent({
           opIndex.value = -1001;
 				}
 			}
+
+      if (tool === 'shear') {
+        await bus.savemiddle();
+        console.log(bus.middleImage.src)
+      }
 		}
 		//当工具更新时相应
 		watch(()=>props.tool, (newVal: string)=>{
@@ -50,8 +57,11 @@ export default defineComponent({
     }
     onMounted(():void=>{
 			if (!inTextarea.value) return;
+      bus.bsCanvasFunction('solidBox', { x: 100, y: 100 }, {x: 300, y: 300})
 			inTextarea.value.style.cssText = 'opacity: 0;z-index: -1001; position: absolute;';
-      initTool(props.tool);
+      nextTick(()=>{
+        initTool(props.tool);
+      })
 		})
 
     expose({

@@ -198,6 +198,7 @@ const paintBucket = function (ImageDate: ImageData, x: number, y: number, color:
       const y1 = pos.y + i[1];
       index = (y1 * width + x1) * 4;
       const colorto = rgbToGray(data[index], data[index + 1], data[index + 2]);
+      
       //通过灰度值判断
       if (
         x1 >= 0 &&
@@ -213,6 +214,7 @@ const paintBucket = function (ImageDate: ImageData, x: number, y: number, color:
       }
     }
   }
+  console.log(ImageDate);
 };
 
 export { ellipse, ellipsefill, updownImage, saveImagMapping, extractPixels, paintBucket };

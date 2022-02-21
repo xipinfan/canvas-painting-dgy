@@ -25,6 +25,7 @@ export default defineComponent({
 			if(canvasCtx.value === null) return;
 			canvasCtx.value.fillStyle = newVal.strokeColor;
 			canvasCtx.value.strokeStyle = newVal.strokeColor;
+      console.log(newVal.strokeColor)
 			canvasCtx.value.lineWidth = newVal.penSize;
 		}
 
@@ -58,6 +59,11 @@ export default defineComponent({
     const setClassName = function(name: string): void {
       if(!canvas.value)return;
       canvas.value.className = name;
+    }
+    // 获取base编码的图片
+    const toDataURL = function (): string {
+      if(!canvas.value){ return '' }
+      return canvas.value?.toDataURL('png', 1);
     }
     // 保存图片函数
     const saveImag = function(name: string, cut: boolean): Promise<boolean> {
@@ -301,6 +307,7 @@ export default defineComponent({
       text,          // 文本
       paintB,        // 油漆桶
       getImageData,  // 获取imagedata
+      toDataURL,     // 导出base编码图片
     })
 
     //将事件导出外部使用

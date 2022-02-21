@@ -14,7 +14,7 @@ export default defineConfig({
     markdown(),
   ],
   server: {
-    port: 8888,
+    port: 12312,
   },
   build: {
     lib: {

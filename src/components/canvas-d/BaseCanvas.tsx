@@ -101,6 +101,15 @@ export default defineComponent({
 					//bsCanvas.value[type].apply(bsCanvas.value, parameters);
 				}
 			};
+      bus.savemiddle = function () :Promise<boolean> {
+        return new Promise((resolve)=>{
+          const base64 = bsCanvas.value?.toDataURL();
+          bus.middleImage.src = base64;
+          bus.middleImage.onload = function () {
+            resolve(true);
+          }
+        })
+      }
     })
 
 		watch( () => item.bgColor, (newVal)=>{
