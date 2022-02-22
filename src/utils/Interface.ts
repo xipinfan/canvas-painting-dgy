@@ -63,9 +63,10 @@ type Type =
   | 'rightTriangle'
   | 'isosceles'
   | 'diamond'
+  | 'bucket'
   | 'text';
 
-type typeD = 'pencilDowm' | 'pencilDowm' | 'eraserMove' | 'eraserDowm' | 'pickupDowm';
+type typeD = 'pencilDowm' | 'pencilDowm' | 'eraserMove' | 'eraserDowm' | 'pickupDowm' | 'bucketDowm';
 
 type typeBsCanvas =
   | 'setCssText'
@@ -92,6 +93,7 @@ type typeMouse = {
   eraserMove: (e: MouseEvent) => void;
   eraserDowm: (e: MouseEvent) => void;
   pickupDowm: (e: MouseEvent) => void;
+  bucketDowm: (e: MouseEvent) => void;
 };
 
 type typeOpD =

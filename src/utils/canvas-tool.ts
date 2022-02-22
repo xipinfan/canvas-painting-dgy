@@ -193,12 +193,13 @@ const paintBucket = function (ImageDate: ImageData, x: number, y: number, color:
     data[index] = R1;
     data[index + 1] = G1;
     data[index + 2] = B1;
+    data[index + 3] = 255;
     for (const i of move_dir) {
       const x1 = pos.x + i[0];
       const y1 = pos.y + i[1];
       index = (y1 * width + x1) * 4;
       const colorto = rgbToGray(data[index], data[index + 1], data[index + 2]);
-      
+
       //通过灰度值判断
       if (
         x1 >= 0 &&

@@ -54,6 +54,9 @@ export default defineComponent({
         });
         pickup.value = `#${datas[0]}${datas[1]}${datas[2]}`;
       },
+			bucketDowm: function (e: MouseEvent): void {
+				bsCanvas.value?.paintB({ x:e.offsetX, y: e.offsetY }, item.bucketIntensity, item.bucketColor);
+			}
 		}
 
 		//通过对象映射调用数组
@@ -86,21 +89,28 @@ export default defineComponent({
     const bucket = function (...buckets: any[]): void {
       bsCanvas.value?.paintB.apply(bsCanvas.value, buckets);
     }
+		// 保存图片
+		const save = function(typeName?:string): string {
+			return bsCanvas.value?.toDataURL(typeName);
+		}
 
+		const bsCanvasFunction = function (type: typeBsCanvas, ...parameters: any[]): void {
+			if (Object.prototype.hasOwnProperty.call(bsCanvas.value, type) && bsCanvas.value) {
+				bsCanvas.value[type](...parameters);
+				//bsCanvas.value[type].apply(bsCanvas.value, parameters);
+			}
+		}
     expose({
       pickup,      //拾色器
       bucket,
+			save,
+			bsCanvasFunction
     })
 
     onMounted(()=>{
       bsCanvas.value?.initBoard(item.bgColor);
 			//通过一个外部的reactive保存数据将调用本地canvas数据的函数传递到兄弟节点
-			bus.bsCanvasFunction = function (type: typeBsCanvas, ...parameters: any[]): void {
-				if (Object.prototype.hasOwnProperty.call(bsCanvas.value, type) && bsCanvas.value) {
-					bsCanvas.value[type](...parameters);
-					//bsCanvas.value[type].apply(bsCanvas.value, parameters);
-				}
-			};
+			bus.bsCanvasFunction = bsCanvasFunction;
       bus.savemiddle = function () :Promise<boolean> {
         return new Promise((resolve)=>{
           const base64 = bsCanvas.value?.toDataURL();

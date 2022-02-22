@@ -7,6 +7,10 @@ const propsCanvasD = {
     type: Number,
     default: 400,
   },
+  border: {
+    type: String,
+    default: '',
+  },
   tool: {
     type: String,
     default: 'pencil',
@@ -42,6 +46,14 @@ const propsCanvasD = {
   shapeStatu: {
     type: String,
     default: 'stroke',
+  },
+  bucketColor: {
+    type: String,
+    default: 'black',
+  },
+  bucketIntensity: {
+    type: String,
+    default: 20,
   },
 };
 

@@ -25,7 +25,6 @@ export default defineComponent({
 			if(canvasCtx.value === null) return;
 			canvasCtx.value.fillStyle = newVal.strokeColor;
 			canvasCtx.value.strokeStyle = newVal.strokeColor;
-      console.log(newVal.strokeColor)
 			canvasCtx.value.lineWidth = newVal.penSize;
 		}
 
@@ -61,9 +60,9 @@ export default defineComponent({
       canvas.value.className = name;
     }
     // 获取base编码的图片
-    const toDataURL = function (): string {
+    const toDataURL = function (typeName: string = 'png'): string {
       if(!canvas.value){ return '' }
-      return canvas.value?.toDataURL('png', 1);
+      return canvas.value?.toDataURL(typeName, 1);
     }
     // 保存图片函数
     const saveImag = function(name: string, cut: boolean): Promise<boolean> {

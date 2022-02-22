@@ -1,6 +1,5 @@
 import { defineComponent, ref, onMounted } from 'vue'
 import CanvasD from './components/canvas-d/CanvasD'
-import ButtonD from './components/button-d/button-d';
 
 export default defineComponent({
 
@@ -12,7 +11,7 @@ export default defineComponent({
 		const penSize = ref<number>(9);
 		const strokeColor = ref<string>('#000000')
     onMounted( () => {
-      canvas.value?.bucket( 0, 0, 1, 'red');
+      // canvas.value?.bucket( 0, 0, 1, 'red');
     })
 
 		const buttonClick = function () {
@@ -33,7 +32,6 @@ export default defineComponent({
 				strokeColor={strokeColor.value}
 				>
 				</CanvasD>
-				<ButtonD></ButtonD>
 				<button onClick={buttonClick}>切换模式</button>
 			</>
     )

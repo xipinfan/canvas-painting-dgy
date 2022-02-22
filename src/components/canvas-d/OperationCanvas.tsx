@@ -1,4 +1,4 @@
-import { defineComponent,inject,ref, onMounted, onBeforeUnmount } from 'vue'
+import { defineComponent,inject,ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import CanvasBasice from './CanvasBasice'
 import { typeOpD, typeOpMouse, typeShare, xy, imgM } from '../../utils/Interface'
 import { bus } from '../../libs/bus'
@@ -15,12 +15,15 @@ export default defineComponent({
       default:-1000
     },
 		inTextarea:{
-			type:String, 
+			type:String,
 			default: ''
 		},
 		getFocus:{
 			type: Function,
 			default:(): void=>{},
+		},
+		bsCanvasFunction: {
+			type: Function,
 		}
   },
   setup(props, { expose }) {
@@ -58,10 +61,10 @@ export default defineComponent({
 		//  调用坐标移动函数
 		const spotChange = function (type: string): void {
 			mouse[type + 'spotChange' as typeShare](
-				mouse.spotNode, 
-				spotBegin, 
-				spotEnd, 
-				{ 
+				mouse.spotNode,
+				spotBegin,
+				spotEnd,
+				{
 					x:mouse.e.x -  mouse.mobile.x,
 					y:mouse.e.y -  mouse.mobile.y,
 				}
@@ -73,14 +76,14 @@ export default defineComponent({
 				opCanvas.value?.initBoard();
 				const h = opCanvas.value?.text( {x1:shapeBegin.x, y1:shapeBegin.y, x2:shapeEnd.x, y2:shapeEnd.y}, props.inTextarea );
 				if(h > Math.abs(shapeEnd.y - shapeBegin.y)){
-					shapeEnd.y = shapeBegin.y + h + 1;	
+					shapeEnd.y = shapeBegin.y + h + 1;
 					spotEnd.y = shapeEnd.y;
 				}
 				twinkle ++;
 				if(twinkle >= 20) twinkle -= 20;
 				opCanvas.value?.dottedBox( shapeBegin, shapeEnd );
 			}, 40)
-			
+
 		}
 		onBeforeUnmount(()=>{
 			clearInterval(textInterval);
@@ -95,9 +98,9 @@ export default defineComponent({
 			shapespotChange,
 			move: function () :void {
 				if (tool === 'line') {		//直线移动判断与其他的不同
-					spotChange('line');	
+					spotChange('line');
 				} else {
-					spotChange('shape');	
+					spotChange('shape');
 				}
 			},
 			lineMove: function (): void {		// 直线绘制
@@ -105,42 +108,42 @@ export default defineComponent({
 				opCanvas.value?.lineBox( spotBegin, spotEnd );
 			},
 			lineDraw: function (): void {		// 直线绘制完成
-				bus.bsCanvasFunction('drawDemoLine', spotBegin, spotEnd);
+				props.bsCanvasFunction && props.bsCanvasFunction('drawDemoLine', spotBegin, spotEnd);
 			},
 			rectangleMove: function (): void {
 				opCanvas.value?.solidBox( shapeBegin, shapeEnd );
 				opCanvas.value?.dottedBox( shapeBegin, shapeEnd );
 			},
 			rectangleDraw: function (): void {
-				bus.bsCanvasFunction('solidBox', shapeBegin, shapeEnd);
+				props.bsCanvasFunction && props.bsCanvasFunction('solidBox', shapeBegin, shapeEnd);
 			},
 			roundMove: function (): void {
 				opCanvas.value?.solidRound( shapeBegin, shapeEnd );
 				opCanvas.value?.dottedBox( shapeBegin, shapeEnd );
 			},
 			roundDraw: function (): void {
-				bus.bsCanvasFunction('solidRound', shapeBegin, shapeEnd);
+				props.bsCanvasFunction && props.bsCanvasFunction('solidRound', shapeBegin, shapeEnd);
 			},
 			rightTriangleMove: function(): void {
 				opCanvas.value?.Triangle( shapeBegin, shapeEnd, 'solid' );
 				opCanvas.value?.dottedBox( shapeBegin, shapeEnd );
 			},
 			rightTriangleDraw: function(): void {
-				bus.bsCanvasFunction('Triangle', shapeBegin, shapeEnd, 'solid');
+				props.bsCanvasFunction && props.bsCanvasFunction('Triangle', shapeBegin, shapeEnd, 'solid');
 			},
 			isoscelesMove: function(): void {
 				opCanvas.value?.Triangle( shapeBegin, shapeEnd, 'isosceles' );
 				opCanvas.value?.dottedBox( shapeBegin, shapeEnd );
 			},
 			isoscelesDraw: function(): void {
-				bus.bsCanvasFunction('Triangle', shapeBegin, shapeEnd, 'isosceles');
+				props.bsCanvasFunction && props.bsCanvasFunction('Triangle', shapeBegin, shapeEnd, 'isosceles');
 			},
 			diamondMove: function(): void {
 				opCanvas.value?.drawDiamond( shapeBegin, shapeEnd );
 				opCanvas.value?.dottedBox( shapeBegin, shapeEnd );
 			},
 			diamondDraw: function(): void {
-				bus.bsCanvasFunction('drawDiamond', shapeBegin, shapeEnd);
+				props.bsCanvasFunction && props.bsCanvasFunction('drawDiamond', shapeBegin, shapeEnd);
 			},
 			textMove: function(): void {
 				opCanvas.value?.text( {x1:shapeBegin.x, y1:shapeBegin.y, x2:shapeEnd.x, y2:shapeEnd.y}, props.inTextarea );
@@ -148,7 +151,7 @@ export default defineComponent({
 				textareaInput();
 			},
 			textDraw: function(): void {
-				bus.bsCanvasFunction('text', {x1:shapeBegin.x, y1:shapeBegin.y, x2:shapeEnd.x, y2:shapeEnd.y}, props.inTextarea);
+				props.bsCanvasFunction && props.bsCanvasFunction('text', {x1:shapeBegin.x, y1:shapeBegin.y, x2:shapeEnd.x, y2:shapeEnd.y}, props.inTextarea);
 			},
 			textLeave: function(): void {
 				props.getFocus();
@@ -167,7 +170,7 @@ export default defineComponent({
 			if (mouse.hasOwnProperty(tool + name)) {
 				mouse[(tool + name) as typeOpD]();
 			}
-			
+
 		}
 
 		const opMousedowm = function (e: MouseEvent): void {
@@ -217,7 +220,7 @@ export default defineComponent({
 			if ( !controlnode ) {		// 切换状态
 				[ spotEnd.x, spotEnd.y ] = [ e.offsetX, e.offsetY ];
 				controlnode = true;
-			} 
+			}
 			if ( !state ) {
 				controlnode = false;
 			} else {
