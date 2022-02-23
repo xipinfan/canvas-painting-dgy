@@ -1,6 +1,6 @@
 import { defineComponent,inject,ref, onMounted, watch } from 'vue'
 import CanvasBasice from './CanvasBasice'
-import { route } from '../../utils/basics-tool'
+import { route } from './tool/basics-tool'
 import { xy, typeD, typeMouse, typeBsCanvas } from '../../utils/Interface'
 import { bus } from '../../libs/bus'
 
@@ -52,6 +52,7 @@ export default defineComponent({
           if(Snum.length < 2) Snum = '0' + Snum;
           return Snum;
         });
+
         pickup.value = `#${datas[0]}${datas[1]}${datas[2]}`;
       },
 			bucketDowm: function (e: MouseEvent): void {

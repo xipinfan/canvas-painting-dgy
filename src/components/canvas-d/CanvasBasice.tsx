@@ -1,6 +1,6 @@
 import { defineComponent,ref,onMounted, inject, watch } from 'vue';
 import { imgM, drawType, xy, trianglePlot } from '../../utils/Interface';
-import { paintBucket, ellipse, ellipsefill } from '../../utils/canvas-tool';
+import { paintBucket, ellipse, ellipsefill } from './tool/canvas-tool';
 
 //基础canvas的定义
 export default defineComponent({

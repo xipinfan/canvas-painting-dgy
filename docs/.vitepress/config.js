@@ -9,6 +9,7 @@ export default {
 				{
 					text: '工具',
 					children: [
+						{ text: 'Esign', link: '/components/esign/' },
 						{ text: 'Canvas', link: '/components/canvas/' },
 						{ text: 'Video', link: '/components/video/' },
 					]

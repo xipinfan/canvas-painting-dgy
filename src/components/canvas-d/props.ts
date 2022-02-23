@@ -49,7 +49,7 @@ const propsCanvasD = {
   },
   bucketColor: {
     type: String,
-    default: 'black',
+    default: 'white',
   },
   bucketIntensity: {
     type: String,

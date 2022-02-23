@@ -1,5 +1,5 @@
 //props的接口定义
-import { linespotChange, shapespotChange } from '../utils/canvas-cursor';
+import { linespotChange, shapespotChange } from '../components/canvas-d/tool/canvas-cursor';
 interface imgRe {
   width: number;
   height: number;

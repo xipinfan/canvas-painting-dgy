@@ -1,4 +1,4 @@
-import { defineComponent,ref,provide,onMounted, watch, PropType, nextTick } from 'vue'
+import { defineComponent,ref,provide,onMounted, watch, nextTick } from 'vue'
 import propsCanvasD from './props';
 import BaseCanvas from './BaseCanvas';
 import { bus } from '../../libs/bus';
@@ -20,13 +20,15 @@ import OperationCanvas from './OperationCanvas';
  * @property {String}    fontFamily    文本字体样式（默认sans-serif）
  * @property {String}    fontWeight    文本粗细（默认400）
  * @property {String}    shapeStatu    图案绘制样式（可选值有fill、stroke，默认stroke）
- * @property {String}    bucketColor    油漆桶颜色（默认black）
+ * @property {String}    bucketColor    油漆桶颜色（默认white）
  * @property {Number}    bucketIntensity    油漆桶力度（默认20）
  *
  *
- * @props {String}    pickup    获取拾色器选择到的颜色
- * @props {Function}    bucket    在指定的位置进行油漆桶操作
- * @props {Function}    save    返回当前画布base64格式的图片
+ * @method {String}    pickup    获取拾色器选择到的颜色
+ * @method {Function}    bucket    在指定的位置进行油漆桶操作
+ * @method {Function}    save    返回当前画布base64格式的图片
+ *
+ * @event {Function} click click事件
  *
  */
 
@@ -35,7 +37,7 @@ export default defineComponent({
   name:'cavnas-d',
   inheritAttrs:false,
   props:propsCanvasD,
-  setup(props, { slots, expose }) {
+  setup(props, { slots, expose, emit }) {
 
     const inTextarea = ref<HTMLTextAreaElement | null>();   //保存textarea
 		const canvas = [ref(), ref()]; //保存基础与操作画布
@@ -44,6 +46,7 @@ export default defineComponent({
     const indexText = ref<string>('');
 		const ImageDatas: string[] = [];
 		const forwardData: string[] = [];
+		const pickupColor = ref<string>('');
     provide('item', props);
     provide('tool', props.tool);
 		provide('ImageDatas', ImageDatas);
@@ -81,6 +84,11 @@ export default defineComponent({
     const getFocus = function () {
       inTextarea.value?.focus();
     }
+
+		const cleanTextarea = function () {
+				indexText.value = '';
+		}
+
     onMounted(():void=>{
 			if (!inTextarea.value) return;
       // bus.bsCanvasFunction('solidBox', { x: 100, y: 100 }, {x: 300, y: 300})
@@ -91,7 +99,7 @@ export default defineComponent({
 		})
 
     expose({
-      pickup: canvas[0].value?.pickup.value,
+      pickup: pickupColor,
       bucket: (x: number, y: number,intensity: number = 20, color: string = props.strokeColor): void=>{
         canvas[0].value?.bucket({ x, y }, intensity, color);
       },
@@ -103,7 +111,7 @@ export default defineComponent({
 
     //总共两层canvas有基础、操作，分别定义在不同的文件，textarea是用来输入文字的
     return () => (
-      <div style={{width:props.width+'px', height:props.height+'px', border: props.border}}>
+      <div onClick={()=>{pickupColor.value = canvas[0].value?.pickup; emit('click'); }} style={{width:props.width+'px', height:props.height+'px', border: props.border}}>
         { slots.default && slots.default() }
 
          <BaseCanvas
@@ -117,6 +125,7 @@ export default defineComponent({
           zIndex={opIndex.value}
           getFocus={getFocus}
 					bsCanvasFunction={canvas[0].value?.bsCanvasFunction}
+					cleanTextarea={cleanTextarea}
           ></OperationCanvas>
 
          <textarea

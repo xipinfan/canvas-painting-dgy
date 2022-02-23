@@ -2,7 +2,7 @@ import { defineComponent,inject,ref, onMounted, onBeforeUnmount, nextTick } from
 import CanvasBasice from './CanvasBasice'
 import { typeOpD, typeOpMouse, typeShare, xy, imgM } from '../../utils/Interface'
 import { bus } from '../../libs/bus'
-import { mousePointLine, boundary, linespotChange, shapespotChange } from '../../utils/canvas-cursor'
+import { mousePointLine, boundary, linespotChange, shapespotChange } from './tool/canvas-cursor'
 
 //操作画布
 export default defineComponent({
@@ -23,6 +23,9 @@ export default defineComponent({
 			default:(): void=>{},
 		},
 		bsCanvasFunction: {
+			type: Function,
+		},
+		cleanTextarea: {
 			type: Function,
 		}
   },
@@ -152,9 +155,11 @@ export default defineComponent({
 			},
 			textDraw: function(): void {
 				props.bsCanvasFunction && props.bsCanvasFunction('text', {x1:shapeBegin.x, y1:shapeBegin.y, x2:shapeEnd.x, y2:shapeEnd.y}, props.inTextarea);
+				props.cleanTextarea && props.cleanTextarea();
 			},
 			textLeave: function(): void {
 				props.getFocus();
+
 				textareaInput();
 			}
 		}
